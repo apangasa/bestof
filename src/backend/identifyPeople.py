@@ -1,3 +1,4 @@
+from os import read
 import cv2 as cv
 import mtcnn
 from matplotlib import pyplot as plt
@@ -5,6 +6,14 @@ from matplotlib import pyplot as plt
 
 def read_img(filename):
     return plt.imread(filename)
+
+
+def save_img(filename, img):
+    cv.imwrite(filename, img)
+
+
+def save_img_colored(filename, img):
+    cv.imwrite(filename, cv.cvtColor(img, cv.COLOR_RGB2BGR))
 
 
 def show_img(image):
@@ -75,19 +84,36 @@ def show_rect(image, top_left, bottom_right):
     show_img(image)
 
 
+def crop_subjects(image):
+    faces_info = detect_faces(image)
+    subjects = []
+    for face in faces_info:
+        bounds = get_subject_bounds(face)
+        x, y, w, h = bounds
+        sub = image[y:y+h, x:x+w]
+        sub = cv.cvtColor(sub, cv.COLOR_BGR2RGB)
+        subjects.append(sub)
+    return subjects
+
+
 # def show_bounding_boxes(image, bounding_boxes):
 #     for box in bounding_boxes:
 #         x, y, w, h = box['box']
 #         cv.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 5)
 #     show_img(image)
 
+def get_eye_frame_from_img(filename):
+    img = read_img(filename)
+    faces_info = detect_faces(img)
+    for face in faces_info:
+        yield get_eye_bounds(face)
+
 
 def main():
     img = read_img('../resources/examples/fourfaces.jpg')
-    faces_info = detect_faces(img)
-    for face in faces_info:
-        eyes = get_eye_bounds(face)
-        show_rect(img, eyes[0], eyes[1])
+    subs = crop_subjects(img)
+    for sub in subs:
+        show_img(sub)
 
 
 if __name__ == '__main__':
