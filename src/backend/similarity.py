@@ -36,7 +36,7 @@ def generate_feature_vector(image):
     return embedding
 
 
-def group(vectors, threshold=0.8):
+def group(vectors, threshold=0.9):
     cos = nn.CosineSimilarity(dim=1, eps=1e-6)
     scores = []
 
@@ -47,7 +47,7 @@ def group(vectors, threshold=0.8):
         for j, v in enumerate(vectors):
             if j > i:
                 scores[i].append(cos(u.unsqueeze(0), v.unsqueeze(0)))
-
+    print(scores)
     groups = []
     for i, row in enumerate(scores):
         for j, element in enumerate(row):
@@ -62,6 +62,14 @@ def group(vectors, threshold=0.8):
                 if not found:
                     # print({i, j})
                     groups.append({i, j})
+            else:
+                found_i = False
+                for k, group in enumerate(groups):
+                    if i in group:
+                        found_i = True
+                if not found_i:
+                    groups.append({i})
+
     # print(scores)
     # print(groups)
     return groups
