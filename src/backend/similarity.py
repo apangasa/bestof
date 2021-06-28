@@ -69,7 +69,12 @@ def group(vectors, threshold=0.9):
                         found_i = True
                 if not found_i:
                     groups.append({i})
-
+    found_last = False
+    for k, group in enumerate(groups):
+        if len(vectors) - 1 in group:
+            found_last = True
+    if not found_last:
+        groups.append({len(vectors) - 1})
     # print(scores)
     # print(groups)
     return groups
