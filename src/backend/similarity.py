@@ -60,18 +60,18 @@ def group(vectors, threshold=0.8):
                         groups[k].add(j)
                         found = True
                 if not found:
-                    print({i, j})
+                    # print({i, j})
                     groups.append({i, j})
-    print(scores)
-    print(groups)
+    # print(scores)
+    # print(groups)
     return groups
 
 
-u = generate_feature_vector(cv.imread('../resources/examples/IMG_1663.jpg'))
-v = generate_feature_vector(cv.imread('../resources/examples/IMG_1665.jpg'))
-w = generate_feature_vector(cv.imread('../resources/examples/IMG_1667.jpg'))
-x = generate_feature_vector(cv.imread('../resources/examples/IMG_1668.jpg'))
-y = generate_feature_vector(cv.imread('../resources/examples/IMG_1669.jpg'))
+# u = generate_feature_vector(cv.imread('../resources/examples/IMG_1663.jpg'))
+# v = generate_feature_vector(cv.imread('../resources/examples/IMG_1665.jpg'))
+# w = generate_feature_vector(cv.imread('../resources/examples/IMG_1667.jpg'))
+# x = generate_feature_vector(cv.imread('../resources/examples/IMG_1668.jpg'))
+# y = generate_feature_vector(cv.imread('../resources/examples/IMG_1669.jpg'))
 
 
-group([u, v, w, x, y])
+# group([u, v, w, x, y])
