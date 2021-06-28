@@ -40,10 +40,10 @@ def group(vectors, threshold=0.8):
     cos = nn.CosineSimilarity(dim=1, eps=1e-6)
     scores = []
 
-    for i in range(len(vectors) - 1):
-        scores.append([])
-
     for i, u in enumerate(vectors):
+        if i != len(vectors) - 1:
+            scores.append([])
+
         for j, v in enumerate(vectors):
             if j > i:
                 scores[i].append(cos(u.unsqueeze(0), v.unsqueeze(0)))
