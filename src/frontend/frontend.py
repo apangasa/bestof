@@ -1,10 +1,21 @@
-import sys
-from PyQt5.QtWidgets import *
-from PyQt5 import QtCore
+
+import cv2 as cv
 from PyQt5 import QtWidgets
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import *
+import sys
+sys.path.insert(1, '../backend/')
+import similarity
+
+
+def loadImages(filenames):
+    for filename in filenames:
+        yield cv.imread(filename)
 
 
 # Reference Source 1: https://learndataanalysis.org/how-to-pass-data-from-one-window-to-another-pyqt5-tutorial/
+
+
 def main():
     class processingResults(QWidget):
         def __init__(self):
@@ -15,8 +26,10 @@ def main():
             self.layout = QVBoxLayout()
             self.layout.addWidget(self.des)
             self.setLayout(self.layout)
+
         def display(self):
             self.show()
+
         def options(self):
             self.des = QGroupBox("Images Selected.",
                                  alignment=QtCore.Qt.AlignCenter)
@@ -28,35 +41,40 @@ def main():
             self.back.clicked.connect(self.close)
             layout.addWidget(self.back)
             self.des.setLayout(layout)
+
         def imageProcessing(self):
             # Code from backend goes here...
             print("Redoing image selection.")
+
     class settingsMenu(QWidget):
         def __init__(self):
             super().__init__()
             self.options()
             self.setWindowTitle("Settings Menu")
-            self.setGeometry(1550,800,500,500)
+            self.setGeometry(1550, 800, 500, 500)
             self.layout = QVBoxLayout()
             self.layout.addWidget(self.des)
             self.setLayout(self.layout)
+
         def display(self):
             self.show()
+
         def options(self):
             self.des = QGroupBox("Apply the following criteria for image refinement.",
-                                       alignment=QtCore.Qt.AlignCenter)
+                                 alignment=QtCore.Qt.AlignCenter)
             layout = QHBoxLayout()
 
             self.closeButton = QPushButton('&Close Settings')
             self.closeButton.clicked.connect(self.close)
             layout.addWidget(self.closeButton)
             self.des.setLayout(layout)
+
     class mainWindow(QWidget):
         def __init__(self):
             super().__init__()
             self.setWindowTitle("GoodPics: Main Menu")
-            self.resize(800,800)
-            self.setGeometry(1550,800,500,500)
+            self.resize(800, 800)
+            self.setGeometry(1550, 800, 500, 500)
             self.nextWindow = settingsMenu()
             self.process = processingResults()
             self.makeUI()
@@ -66,7 +84,7 @@ def main():
 
         def makeUI(self):
             self.firstText = QGroupBox("Welcome, browse your computer for images to start picture analysis.",
-                                        alignment=QtCore.Qt.AlignCenter)
+                                       alignment=QtCore.Qt.AlignCenter)
             layout = QHBoxLayout()
             self.addImage = QPushButton('&Add Images')
             self.addImage.clicked.connect(self.getFiles)
@@ -79,18 +97,28 @@ def main():
             layout.addWidget(self.settings)
             self.firstText.setLayout(layout)
 
-        def getFiles(self): # Grabs the files for image selection... work in progress...
-            file = QFileDialog.getOpenFileNames(self, 'Add Files', QtCore.QDir.rootPath())
+        # Grabs the files for image selection... work in progress...
+
+        def getFiles(self):
+            file = QFileDialog.getOpenFileNames(
+                self, 'Add Files', QtCore.QDir.rootPath())
             files = ""
             layout = QVBoxLayout
-            for filename in file:
-                files = str(filename)
-                print(files)
+            image_generator = loadImages(list(file[0]))
+            vectors = []
+            for image in image_generator:
+                v = similarity.generate_feature_vector(image)
+                vectors.append(v)
 
-    newApp = QApplication(sys.argv) #Creates application class
+            threshold = 0.8  # this should be grabbed from whatever the user set it to in the settings
+            groups = similarity.group(vectors, threshold=threshold)
+            print(groups)
+
+    newApp = QApplication(sys.argv)  # Creates application class
     wind = mainWindow()
     wind.show()
-    newApp.exec() #Executes app with the window
+    newApp.exec()  # Executes app with the window
+
 
 if __name__ == '__main__':
     main()
