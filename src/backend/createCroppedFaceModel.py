@@ -9,7 +9,7 @@ import torch.optim as optim
 import torch.nn as nn
 import torch.nn.functional as fn
 from torch.utils.data import DataLoader, Dataset, random_split
-from createCroppedFaceDataset import faceDataset
+from createCroppedFaceDataset import custom_dataset
 
 class cropped_model(nn.Module):
     def __init__(self):
@@ -101,7 +101,7 @@ def train(all_x, all_y, split, device):
     transform = transforms.Compose(
     [transforms.ToTensor()])
 
-    full_dataset = faceDataset(all_x, all_y, transform)
+    full_dataset = custom_dataset(all_x, all_y, transform)
     train_len = math.floor(len(all_x) * split)
     val_len = len(all_x) - train_len
     train_dataset, val_dataset = random_split(full_dataset, [train_len, val_len])

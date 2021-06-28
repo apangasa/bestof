@@ -2,7 +2,7 @@ import torch
 from torch.utils.data import Dataset
 
 # Custom dataset model for the data
-class faceDataset(Dataset):
+class custom_dataset(Dataset):
     def __init__(self, all_x, all_y, transform, target_transform=None):
         self.all_x = all_x
         self.all_y = all_y
