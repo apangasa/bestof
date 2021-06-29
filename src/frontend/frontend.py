@@ -6,11 +6,15 @@ from PyQt5.QtWidgets import *
 import sys
 sys.path.insert(1, '../backend/')
 import similarity
+from classDefinitions import BlinkAndCropNet, cropped_model
+import blinkDetector
+import cropDetector
+import identifyPeople
 
 
 def loadImages(filenames):
     for filename in filenames:
-        yield cv.imread(filename)
+        yield identifyPeople.read_img(filename)
 
 
 # Reference Source 1: https://learndataanalysis.org/how-to-pass-data-from-one-window-to-another-pyqt5-tutorial/
@@ -18,9 +22,9 @@ def loadImages(filenames):
 
 def main():
     class processingResults(QWidget):
-        def __init__(self):
+        def __init__(self, imagelist):
             super().__init__()
-            self.options()
+            self.options(imagelist)
             self.setWindowTitle("GoodPics")
             self.setGeometry(1550, 800, 500, 500)
             self.layout = QVBoxLayout()
@@ -30,9 +34,10 @@ def main():
         def display(self):
             self.show()
 
-        def options(self):
+        def options(self, imagelist):
             self.des = QGroupBox("Images Selected.",
                                  alignment=QtCore.Qt.AlignCenter)
+            vert = QVBoxLayout()
             layout = QHBoxLayout()
             self.redo = QPushButton('&Run Again')
             self.redo.clicked.connect(self.imageProcessing)
@@ -40,7 +45,11 @@ def main():
             self.back = QPushButton('&Back to Main Menu')
             self.back.clicked.connect(self.close)
             layout.addWidget(self.back)
-            self.des.setLayout(layout)
+            info = imagelist
+            label = QLabel(str(info))
+            vert.addWidget(label)
+            vert.addLayout(layout)
+            self.des.setLayout(vert)
 
         def imageProcessing(self):
             # Code from backend goes here...
@@ -72,11 +81,12 @@ def main():
     class mainWindow(QWidget):
         def __init__(self):
             super().__init__()
+            self.imagelist = []
             self.setWindowTitle("GoodPics: Main Menu")
             self.resize(800, 800)
             self.setGeometry(1550, 800, 500, 500)
             self.nextWindow = settingsMenu()
-            self.process = processingResults()
+            self.process = processingResults(self.imagelist)
             self.makeUI()
             self.layout = QVBoxLayout()
             self.layout.addWidget(self.firstText)
@@ -113,6 +123,36 @@ def main():
             threshold = 0.8  # this should be grabbed from whatever the user set it to in the settings
             groups = similarity.group(vectors, threshold=threshold)
             print(groups)
+
+            image_generator = loadImages(list(file[0]))
+
+            bestof_scores = []
+
+            for image in image_generator:
+                # print('Scanning Image...')
+                subjects = identifyPeople.crop_subjects(image)
+                print("len of subjects", len(subjects))
+                blinks = 0
+                crops = 0
+                for sub in subjects:
+                    identifyPeople.show_img(sub)
+                    # print('Scanning Subject...')
+                    if blinkDetector.test(sub):
+                        blinks += 1
+                    if cropDetector.test(sub):
+                        crops += 1
+
+                blink_score = (len(subjects) - blinks) / len(subjects)
+                crop_score = (len(subjects) - crops) / len(subjects)
+
+                bestof_score = blink_score + crop_score
+                bestof_scores.append(bestof_score)
+            final = zip(range(len(file[0])), file[0], bestof_scores)
+
+            final = sorted(final, key=lambda x: x[2], reverse=True)
+            print(final)
+            self.imagelist = final
+            print(self.imagelist)
 
     newApp = QApplication(sys.argv)  # Creates application class
     wind = mainWindow()
