@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup (
     name = "bestOf",
-    version = "0.0.3",
+    version = "0.0.4",
     description = "A module that uses machine learning to chose the best image in groups",
     packages = ["src",], # Change TODO
     url = "https://github.com/apangasa/bestof",
