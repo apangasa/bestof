@@ -3,6 +3,7 @@ import cv2 as cv
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 import sys
 sys.path.insert(1, '../backend/')
 import similarity
@@ -17,24 +18,28 @@ def loadImages(filenames):
         yield identifyPeople.read_img(filename)
 
 
+IMAGELIST = []
+GROUPS = []
+
 # Reference Source 1: https://learndataanalysis.org/how-to-pass-data-from-one-window-to-another-pyqt5-tutorial/
 
 
 def main():
     class processingResults(QWidget):
-        def __init__(self, imagelist):
+        def __init__(self):
             super().__init__()
-            self.options(imagelist)
-            self.setWindowTitle("GoodPics")
+            self.options()
+            self.setWindowTitle("Best Of")
             self.setGeometry(1550, 800, 500, 500)
             self.layout = QVBoxLayout()
             self.layout.addWidget(self.des)
             self.setLayout(self.layout)
 
         def display(self):
+            self.__init__()
             self.show()
 
-        def options(self, imagelist):
+        def options(self):
             self.des = QGroupBox("Images Selected.",
                                  alignment=QtCore.Qt.AlignCenter)
             vert = QVBoxLayout()
@@ -45,9 +50,21 @@ def main():
             self.back = QPushButton('&Back to Main Menu')
             self.back.clicked.connect(self.close)
             layout.addWidget(self.back)
-            info = imagelist
-            label = QLabel(str(info))
-            vert.addWidget(label)
+            info = IMAGELIST
+            groups = GROUPS
+            if len(info) == 0:
+                return
+            print(info)
+            print(groups)
+            for group in groups:
+                h = QHBoxLayout()
+                for index in group:
+                    lab = QLabel()
+                    for el in info:
+                        if el[0] == index:
+                            lab.setPixmap(QPixmap(el[1]))
+                    h.addWidget(lab)
+                vert.addLayout(h)
             vert.addLayout(layout)
             self.des.setLayout(vert)
 
@@ -81,12 +98,11 @@ def main():
     class mainWindow(QWidget):
         def __init__(self):
             super().__init__()
-            self.imagelist = []
-            self.setWindowTitle("GoodPics: Main Menu")
+            self.setWindowTitle("Best Of: Main Menu")
             self.resize(800, 800)
             self.setGeometry(1550, 800, 500, 500)
             self.nextWindow = settingsMenu()
-            self.process = processingResults(self.imagelist)
+            self.process = processingResults()
             self.makeUI()
             self.layout = QVBoxLayout()
             self.layout.addWidget(self.firstText)
@@ -110,6 +126,8 @@ def main():
         # Grabs the files for image selection... work in progress...
 
         def getFiles(self):
+            global IMAGELIST
+            global GROUPS
             file = QFileDialog.getOpenFileNames(
                 self, 'Add Files', QtCore.QDir.rootPath())
             files = ""
@@ -123,6 +141,7 @@ def main():
             threshold = 0.8  # this should be grabbed from whatever the user set it to in the settings
             groups = similarity.group(vectors, threshold=threshold)
             print(groups)
+            GROUPS = groups
 
             image_generator = loadImages(list(file[0]))
 
@@ -151,8 +170,7 @@ def main():
 
             final = sorted(final, key=lambda x: x[2], reverse=True)
             print(final)
-            self.imagelist = final
-            print(self.imagelist)
+            IMAGELIST = final
 
     newApp = QApplication(sys.argv)  # Creates application class
     wind = mainWindow()
