@@ -154,7 +154,7 @@ def main():
                 blinks = 0
                 crops = 0
                 for sub in subjects:
-                    identifyPeople.show_img(sub)
+                    # identifyPeople.show_img(sub)
                     # print('Scanning Subject...')
                     if blinkDetector.test(sub):
                         blinks += 1
