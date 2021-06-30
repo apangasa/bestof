@@ -1,0 +1,6 @@
+torch
+PyQt5
+mtcnn
+Pillow
+matplotlib
+opencv-python

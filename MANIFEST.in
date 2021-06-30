@@ -1,1 +1,1 @@
-include src/backend/saved_models/*.pth
+include bestOf/backend/saved_models/*.pth
