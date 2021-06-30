@@ -1,5 +1,10 @@
 # bestof
 
+## Installation and Running
+The pip installation command is: pip install bestOf==0.0.39
+To run bestOf, simply type: "bestOf" (without the quotes) and watch the magic. 
+Please note that as of now, we are unable to get it to install on linux machines or machines that don't already have the dependencies installed. Because of this, here are the dependencies for bestOf so that you can install them seperately and then run it.
+
 ## Summary
 
 BestOf is an application designed to curate and cleanse large image libraries from events where several similar photos are often taken. Users simply upload all the relevant images, and BestOf returns an intuitive menu displaying their images organized into a grid layout. Each row of the grid represents a group, indicating that all images in a particular row are very similar in nature. The first image in each row is the recommended and default selected image, and at the end of the process, the user can download all selected images (having the option to select of the non-recommended ones if they so choose).
