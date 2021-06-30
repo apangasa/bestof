@@ -12,7 +12,6 @@ setup (
     "Pillow", 
     "matplotlib", 
     "opencv-python"],
-
     include_package_data = True,
 
     entry_points = {
