@@ -3,8 +3,7 @@
 ## Installation and Running
 
 The pip installation command is: pip install bestOf==0.0.39
-To run bestOf, simply type: "bestOf" (without the quotes) and watch the magic. 
-Please note that as of now, we are unable to get it to install on linux machines.
+To run bestOf, simply type: "bestOf" (without the quotes) and watch the magic. As of now it will not install in virtual environments.
 
 ## Summary
 
