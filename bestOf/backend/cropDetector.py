@@ -10,6 +10,8 @@ sitePackageList = sys.path
 sitePackPath = ""
 
 for i in sitePackageList:
+    if not os.path.isdir(i):
+        continue
     if "bestOf" in os.listdir(i):
         sitePackPath = os.path.join(
             i, "bestOf\\backend\\saved_models\\cropped_faces.pth")
@@ -18,6 +20,9 @@ sitePackPath = sitePackPath.replace("\\", "/")
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = BlinkAndCropNet()
+
+# sitePackPath = 'bestOf\\backend\\saved_models\\cropped_faces.pth'
+
 
 model.load_state_dict(torch.load(sitePackPath, map_location=device))
 model.eval()
