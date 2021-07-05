@@ -5,13 +5,14 @@ import cv2 as cv
 
 from bestOf.backend.classDefinitions import BlinkAndCropNet
 import os
-import site
-sitePackageList = site.getsitepackages()
+import sys
+sitePackageList = sys.path
 sitePackPath = ""
 
 for i in sitePackageList:
     if "bestOf" in os.listdir(i):
-        sitePackPath = os.path.join(i, "bestOf\\backend\\saved_models\\cropped_faces.pth")
+        sitePackPath = os.path.join(
+            i, "bestOf\\backend\\saved_models\\cropped_faces.pth")
 
 sitePackPath = sitePackPath.replace("\\", "/")
 
