@@ -1,7 +1,12 @@
 from os import read
 import cv2 as cv
-import mtcnn
+# import mtcnn
+import mediapipe as mp
 from matplotlib import pyplot as plt
+
+
+FACE_DETECTOR = mp.solutions.face_detection.FaceDetection(
+    min_detection_confidence=0.4)
 
 
 def read_img(filename):
@@ -25,12 +30,11 @@ def detect_faces(image):
     if image is None:
         raise Exception('No image found.')
 
-    model = mtcnn.mtcnn.MTCNN()
-    return model.detect_faces(image)
+    return FACE_DETECTOR.process(image).detections
 
 
 def get_subject_bounds(face_info):
-    return face_info['box']
+    return face_info.location_data.relative_bounding_box
 
 
 # def correct_eye_bounds(top_left, bottom_right):
@@ -86,11 +90,17 @@ def show_rect(image, top_left, bottom_right):
 
 def crop_subjects(image):
     faces_info = detect_faces(image)
+
+    im_height, im_width, _ = image.shape
+
     subjects = []
     for face in faces_info:
+        print(face)
         bounds = get_subject_bounds(face)
-        x, y, w, h = bounds
-        sub = image[y:y+h, x:x+w]
+
+        x, y, w, h = int(bounds.xmin * im_width), int(bounds.ymin * im_height), int(
+            bounds.width * im_width), int(bounds.height * im_height)
+        sub = image[y:y + h, x:x + w]
         sub = cv.cvtColor(sub, cv.COLOR_BGR2RGB)
         subjects.append(sub)
     return subjects
@@ -110,7 +120,7 @@ def get_eye_frame_from_img(filename):
 
 
 def main():
-    img = read_img('../resources/examples/fourfaces.jpg')
+    img = read_img('./bestOf/resources/examples/fourfaces.jpg')
     subs = crop_subjects(img)
     for sub in subs:
         show_img(sub)
