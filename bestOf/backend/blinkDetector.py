@@ -49,4 +49,4 @@ def test(image):
         return 0
 
 
-test(cv.imread('../resources/blinkset/blinkers/closed_eye_0059.jpg_face_2.jpg'))
+# test(cv.imread('../resources/blinkset/blinkers/closed_eye_0059.jpg_face_2.jpg'))
