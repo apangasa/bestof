@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="bestOf",
-    version="0.0.51",
+    version="0.0.52",
     description="A module that uses machine learning to chose the best image in groups",
     packages=["bestOf", "bestOf.backend",
               "bestOf.backend.saved_models", "bestOf.frontend", ],
