@@ -8,6 +8,9 @@ import sys
 import os
 print("Starting...")
 
+# sys.path.insert(1, 'bestOf/backend')
+
+
 import bestOf.backend.similarity as similarity
 from bestOf.backend.classDefinitions import BlinkAndCropNet, cropped_model
 import bestOf.backend.blinkDetector as blinkDetector
@@ -162,6 +165,10 @@ def main():
                         blinks += 1
                     if cropDetector.test(sub):
                         crops += 1
+
+                if len(subjects) == 0:
+                    bestof_scores.append(0)
+                    continue
 
                 blink_score = (len(subjects) - blinks) / len(subjects)
                 crop_score = (len(subjects) - crops) / len(subjects)
