@@ -94,6 +94,10 @@ def crop_subjects(image):
     im_height, im_width, _ = image.shape
 
     subjects = []
+
+    if not faces_info:
+        return []
+
     for face in faces_info:
         print(face)
         bounds = get_subject_bounds(face)
