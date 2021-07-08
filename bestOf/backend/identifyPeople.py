@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 
 
 FACE_DETECTOR = mp.solutions.face_detection.FaceDetection(
-    model_selection=1, min_detection_confidence=0.75)
+    model_selection=1, min_detection_confidence=0.6)
 
 
 def read_img(filename):
@@ -99,7 +99,7 @@ def crop_subjects(image):
         return []
 
     for face in faces_info:
-        print(face.score)
+        # print(face.score)
         bounds = get_subject_bounds(face)
 
         x, y, w, h = int(bounds.xmin * im_width), int(bounds.ymin * im_height), int(
@@ -124,7 +124,7 @@ def get_eye_frame_from_img(filename):
 
 
 def main():
-    img = read_img('./bestOf/resources/examples/fourfaces.jpg')
+    img = read_img('./bestOf/resources/examples/IMG_1663 - Copy.jpg')
     subs = crop_subjects(img)
     for sub in subs:
         show_img(sub)
