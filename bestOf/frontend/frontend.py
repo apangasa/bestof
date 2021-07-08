@@ -1,5 +1,3 @@
-
-import cv2 as cv
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import *
@@ -8,13 +6,14 @@ import sys
 import os
 print("Starting...")
 
-# sys.path.insert(1, 'bestOf/backend')
+sys.path.insert(1, 'bestOf/backend')
 
 
 import bestOf.backend.similarity as similarity
 from bestOf.backend.classDefinitions import BlinkAndCropNet, cropped_model
 import bestOf.backend.blinkDetector as blinkDetector
 import bestOf.backend.cropDetector as cropDetector
+import bestOf.backend.evaluateSharpness as evaluateSharpness
 import bestOf.backend.identifyPeople as identifyPeople
 
 
@@ -59,8 +58,8 @@ def main():
             groups = GROUPS
             if len(info) == 0:
                 return
-            print(info)
-            print(groups)
+            # print(info)
+            # print(groups)
             for group in groups:
                 h = QHBoxLayout()
                 for index in group:
@@ -74,8 +73,53 @@ def main():
             self.des.setLayout(vert)
 
         def imageProcessing(self):
-            # Code from backend goes here...
-            print("Redoing image selection.")
+            image_generator = loadImages([element[1] for element in IMAGELIST])
+
+            # Criteria should be populated from settings selections
+            criteria = {
+                'sharpness': True,
+                'centering': False,
+                'lighting': False,
+                'resolution': False
+            }
+
+            if criteria['sharpness']:
+                sharpness_scores = []
+                for image in image_generator:
+                    sharpness_scores.append(evaluateSharpness.evaluate_sharpness(
+                        image))
+                # index to normalized sharpness score + half of normalized subject sharpness score
+                sharpness_map = {}
+                for group in GROUPS:
+                    group_sharpness_scores = []
+                    for index in group:
+                        for pos, item in enumerate(IMAGELIST):
+                            if item[0] == index:
+                                group_sharpness_scores.append(
+                                    sharpness_scores[pos])
+                                break
+                    group_sharpness_scores = evaluateSharpness.normalize_sharpness_scores(
+                        group_sharpness_scores)
+
+                    avg_subject_sharpness_scores = []
+                    for index in group:
+                        for pos, item in enumerate(IMAGELIST):
+                            if item[0] == index:
+                                subject_sharpness_scores = item[3]
+                                if not len(subject_sharpness_scores):
+                                    avg_subject_sharpness_scores.append(0)
+                                    continue
+
+                                avg_subject_sharpness_scores.append(
+                                    sum(subject_sharpness_scores) / len(subject_sharpness_scores))
+                    avg_subject_sharpness_scores = evaluateSharpness.normalize_sharpness_scores(
+                        avg_subject_sharpness_scores)
+
+                    for idx_in_group, index in enumerate(group):
+                        sharpness_map[index] = group_sharpness_scores[idx_in_group] + \
+                            (avg_subject_sharpness_scores[idx_in_group] / 2)
+
+                print(sharpness_map)
 
     class settingsMenu(QWidget):
         def __init__(self):
@@ -145,19 +189,23 @@ def main():
 
             threshold = 0.8  # this should be grabbed from whatever the user set it to in the settings
             groups = similarity.group(vectors, threshold=threshold)
-            print(groups)
+            # print(groups)
             GROUPS = groups
 
             image_generator = loadImages(list(file[0]))
 
-            bestof_scores = []
+            default_scores = []
+            subject_sharpness_scores = []
 
             for image in image_generator:
                 # print('Scanning Image...')
                 subjects = identifyPeople.crop_subjects(image)
-                print("len of subjects", len(subjects))
+                # print("len of subjects", len(subjects))
                 blinks = 0
                 crops = 0
+
+                subject_sharpness_scores.append([])
+
                 for sub in subjects:
                     # identifyPeople.show_img(sub)
                     # print('Scanning Subject...')
@@ -165,18 +213,29 @@ def main():
                         blinks += 1
                     if cropDetector.test(sub):
                         crops += 1
+                    subject_sharpness_scores[-1].append(
+                        evaluateSharpness.evaluate_sharpness(sub))
 
                 if len(subjects) == 0:
-                    bestof_scores.append(0)
+                    default_scores.append(0)
                     continue
 
                 blink_score = (len(subjects) - blinks) / len(subjects)
                 crop_score = (len(subjects) - crops) / len(subjects)
 
-                bestof_score = blink_score + crop_score
-                bestof_scores.append(bestof_score)
-            final = zip(range(len(file[0])), file[0], bestof_scores)
+                default_score = blink_score + crop_score
+                default_scores.append(default_score)
 
+            if len(IMAGELIST):
+                max_index = max([ind for ind in IMAGELIST[0]])
+            else:
+                max_index = -1
+
+            final = zip(
+                range(max_index + 1, max_index + 1 + len(file[0])), file[0], default_scores, subject_sharpness_scores)
+
+            if len(IMAGELIST):
+                final = final + IMAGELIST
             final = sorted(final, key=lambda x: x[2], reverse=True)
             print(final)
             IMAGELIST = final
