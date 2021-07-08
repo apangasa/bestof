@@ -27,7 +27,7 @@ def normalize_sharpness_scores(group_scores):
     max_val = max(group_scores)
 
     if not max_val:
-        return [1] * len(group_scores)
+        return [1.0] * len(group_scores)
 
     normalized_scores = [float(score) / float(max_val)
                          for score in group_scores]
