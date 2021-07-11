@@ -94,9 +94,10 @@ def crop_subjects(image):
     im_height, im_width, _ = image.shape
 
     subjects = []
+    bounds_list = []
 
     if not faces_info:
-        return []
+        return [], []
 
     for face in faces_info:
         # print(face.score)
@@ -107,7 +108,8 @@ def crop_subjects(image):
         sub = image[y:y + h, x:x + w]
         sub = cv.cvtColor(sub, cv.COLOR_BGR2RGB)
         subjects.append(sub)
-    return subjects
+        bounds_list.append(bounds)
+    return subjects, bounds_list
 
 
 # def show_bounding_boxes(image, bounding_boxes):
@@ -125,7 +127,7 @@ def get_eye_frame_from_img(filename):
 
 def main():
     img = read_img('./bestOf/resources/examples/IMG_1663 - Copy.jpg')
-    subs = crop_subjects(img)
+    subs, _ = crop_subjects(img)
     for sub in subs:
         show_img(sub)
 
