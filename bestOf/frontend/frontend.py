@@ -15,6 +15,7 @@ import bestOf.backend.blinkDetector as blinkDetector
 import bestOf.backend.cropDetector as cropDetector
 import bestOf.backend.evaluateSharpness as evaluateSharpness
 import bestOf.backend.identifyPeople as identifyPeople
+import bestOf.backend.evaluateCentering as evaluateCentering
 
 
 def loadImages(filenames):
@@ -78,7 +79,7 @@ def main():
             # Criteria should be populated from settings selections
             criteria = {
                 'sharpness': True,
-                'centering': False,
+                'centering': True,
                 'lighting': False,
                 'resolution': False
             }
@@ -120,6 +121,9 @@ def main():
                             (avg_subject_sharpness_scores[idx_in_group] / 2)
 
                 print(sharpness_map)
+
+            if criteria['centering']:
+                pass
 
     class settingsMenu(QWidget):
         def __init__(self):
@@ -196,15 +200,19 @@ def main():
 
             default_scores = []
             subject_sharpness_scores = []
+            centering_scores = []
 
             for image in image_generator:
                 # print('Scanning Image...')
-                subjects = identifyPeople.crop_subjects(image)
+                subjects, bounds_list = identifyPeople.crop_subjects(image)
                 # print("len of subjects", len(subjects))
                 blinks = 0
                 crops = 0
 
                 subject_sharpness_scores.append([])
+
+                centering_scores.append(
+                    evaluateCentering.evaluate_centering(bounds_list, image))
 
                 for sub in subjects:
                     # identifyPeople.show_img(sub)
@@ -213,6 +221,7 @@ def main():
                         blinks += 1
                     if cropDetector.test(sub):
                         crops += 1
+
                     subject_sharpness_scores[-1].append(
                         evaluateSharpness.evaluate_sharpness(sub))
 
@@ -232,7 +241,7 @@ def main():
                 max_index = -1
 
             final = zip(
-                range(max_index + 1, max_index + 1 + len(file[0])), file[0], default_scores, subject_sharpness_scores)
+                range(max_index + 1, max_index + 1 + len(file[0])), file[0], default_scores, subject_sharpness_scores, centering_scores)
 
             if len(IMAGELIST):
                 final = final + IMAGELIST
