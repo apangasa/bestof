@@ -11,7 +11,7 @@ import torch.nn.functional as fn
 from torch.utils.data import DataLoader, Dataset, random_split
 from bestOf.backend.createCroppedFaceDataset import custom_dataset
 
-import identifyPeople
+import bestOf.backend.identifyPeople as identifyPeople
 
 
 class BlinkAndCropNet(torch.nn.Module):
@@ -101,12 +101,13 @@ def load_dataset(img_height, img_width):
 
         try:
             subs, _ = identifyPeople.crop_subjects(image)
-        except:
+        except Exception as e:
             continue
 
         if len(subs) == 1:
             image = subs[0]
         else:
+            # identifyPeople.show_img(image)
             continue
 
         if image.shape[0] < img_height or image.shape[1] < img_width:
