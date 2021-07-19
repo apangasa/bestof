@@ -1,12 +1,10 @@
-from os import read
 import cv2 as cv
-# import mtcnn
 import mediapipe as mp
 from matplotlib import pyplot as plt
 
 
 FACE_DETECTOR = mp.solutions.face_detection.FaceDetection(
-    model_selection=1, min_detection_confidence=0.6)
+    model_selection=0, min_detection_confidence=0.5)
 
 
 def read_img(filename):
@@ -103,10 +101,25 @@ def crop_subjects(image):
         # print(face.score)
         bounds = get_subject_bounds(face)
 
-        x, y, w, h = int(bounds.xmin * im_width), int(bounds.ymin * im_height), int(
+        xmin = bounds.xmin if bounds.xmin > 0 else 0
+        xmin = xmin if xmin < 1 else 1
+        ymin = bounds.ymin if bounds.ymin > 0 else 0
+        ymin = ymin if ymin < 1 else 1
+
+        x, y, w, h = int(xmin * im_width), int(ymin * im_height), int(
             bounds.width * im_width), int(bounds.height * im_height)
         sub = image[y:y + h, x:x + w]
-        sub = cv.cvtColor(sub, cv.COLOR_BGR2RGB)
+
+        if not len(sub):
+            continue
+
+        try:
+            sub = cv.cvtColor(sub, cv.COLOR_BGR2RGB)
+        except:
+            print(xmin, ymin)
+            print(x, y, w, h)
+            print(sub)
+
         subjects.append(sub)
         bounds_list.append(bounds)
     return subjects, bounds_list
