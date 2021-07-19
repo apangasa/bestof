@@ -11,6 +11,8 @@ import torch.nn.functional as fn
 from torch.utils.data import DataLoader, Dataset, random_split
 from bestOf.backend.createCroppedFaceDataset import custom_dataset
 
+import identifyPeople
+
 
 class BlinkAndCropNet(torch.nn.Module):
     def __init__(self):
@@ -62,12 +64,25 @@ def load_dataset(img_height, img_width):
     #folder_path = os.path.join(nonblinkpath, folder)
 
     for img in os.listdir(nonblinkpath):
-        image = cv.imread(os.path.join(nonblinkpath, img))
+        image = identifyPeople.read_img(os.path.join(nonblinkpath, img))
+
+        if image is None:
+            print('Could not find', img)
+            continue
+
+        try:
+            subs, _ = identifyPeople.crop_subjects(image)
+        except:
+            continue
+
+        if len(subs) == 1:
+            image = subs[0]
+        else:
+            continue
 
         if image.shape[0] < img_height or image.shape[1] < img_width:
             continue
 
-        image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
         image = cv.resize(image, (img_height, img_width),
                           interpolation=cv.INTER_AREA)
         img_count += 1
@@ -78,12 +93,25 @@ def load_dataset(img_height, img_width):
         #folder_path = os.path.join(blinkpath, folder)
 
     for img in os.listdir(blinkpath):
-        image = cv.imread(os.path.join(blinkpath, img))
+        image = identifyPeople.read_img(os.path.join(blinkpath, img))
+
+        if image is None:
+            print('Could not find', img)
+            continue
+
+        try:
+            subs, _ = identifyPeople.crop_subjects(image)
+        except:
+            continue
+
+        if len(subs) == 1:
+            image = subs[0]
+        else:
+            continue
 
         if image.shape[0] < img_height or image.shape[1] < img_width:
             continue
 
-        image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
         image = cv.resize(image, (img_height, img_width),
                           interpolation=cv.INTER_AREA)
         img_count += 1
@@ -186,4 +214,4 @@ if __name__ == "__main__":
     all_x, all_y = load_dataset(img_height, img_width)
     model, val_loader = train(all_x, all_y, train_val_split, device)
     validation(model, val_loader, device)
-    print("Done with creating the face cropped detection model!")
+    print("Done with creating the blink detection model!")
