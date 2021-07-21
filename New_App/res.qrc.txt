@@ -1,0 +1,8 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>img/background.png</file>
+    <file>img/download__3_-removebg-preview.png</file>
+    <file>img/kisspng-computer-icons-download-button-symbol-plus-5abd9e3ed95b29.3600526615223762548903-removebg-preview.png</file>
+    <file>img/run-removebg-preview.png</file>
+</qresource>
+</RCC>
