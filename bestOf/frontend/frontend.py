@@ -3,6 +3,7 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 import sys
+import numpy as np
 import os
 print("Starting...")
 
@@ -20,7 +21,8 @@ import bestOf.backend.evaluateCentering as evaluateCentering
 
 def loadImages(filenames):
     for filename in filenames:
-        yield identifyPeople.read_img(filename)
+        image = identifyPeople.read_img(filename)
+        yield (image * 255).astype(np.uint8)[:, :, :3] if 'png' in filename else image
 
 
 IMAGELIST = []
