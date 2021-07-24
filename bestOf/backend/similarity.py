@@ -53,27 +53,24 @@ def group(vectors, threshold=0.9):
         for j, element in enumerate(row):
             j = j + i + 1
             if element >= threshold:
-                found = False
                 for k, group in enumerate(groups):
                     if i in group or j in group:
                         groups[k].add(i)
                         groups[k].add(j)
-                        found = True
-                if not found:
+                        break
+                else:
                     # print({i, j})
                     groups.append({i, j})
             else:
-                found_i = False
                 for k, group in enumerate(groups):
                     if i in group:
-                        found_i = True
-                if not found_i:
+                        break
+                else:
                     groups.append({i})
-    found_last = False
     for k, group in enumerate(groups):
         if len(vectors) - 1 in group:
-            found_last = True
-    if not found_last:
+            break
+    else:
         groups.append({len(vectors) - 1})
     # print(scores)
     # print(groups)
