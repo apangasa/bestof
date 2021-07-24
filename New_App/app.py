@@ -5,7 +5,7 @@
 # Created by: PyQt5 UI code generator 5.15.4
 #
 # WARNING: Any manual changes made to this file will be lost when pyuic5 is
-# run again.
+# run again.  
 from PyQt5.QtGui import *
 import sys
 import numpy as np
@@ -160,7 +160,9 @@ class Ui_MainWindow(QWidget):
             self, 'Add Files', QtCore.QDir.rootPath(), "Image Files (*.png *.jpg)")
         if len(file[0]) == 0:
             self.changeStatus("No files selected", "red")
+            self.changeProgress(0)
             return
+        self.changeStatus("Loading...")
         thread = Thread(target=self.loadFiles, args=(file,))
         thread.start()
 
