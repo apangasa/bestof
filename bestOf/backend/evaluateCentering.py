@@ -17,4 +17,6 @@ def evaluate_centering(bounds_list, image):
         dist = euclidean(coord, center)
         total_dist += dist
 
-    return total_dist / len(bounds_list) if len(bounds_list) else None
+    max_dist = math.sqrt((center[0] ** 2) + (center[1] ** 2))
+
+    return max_dist - (total_dist / len(bounds_list)) / max_dist if len(bounds_list) and max_dist else None
