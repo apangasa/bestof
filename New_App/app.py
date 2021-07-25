@@ -120,7 +120,7 @@ class Ui_MainWindow(QWidget):
         self.statusChangedSignal.connect(self.changeStatus)
 
         self.Status.setText("Waiting for uploading")
-        self.Ui_MainMenu.Add.clicked.connect(self.getFiles)
+        self.Ui_MainMenu.add_files_button.clicked.connect(self.getFiles)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
