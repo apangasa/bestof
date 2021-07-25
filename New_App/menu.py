@@ -5,7 +5,7 @@
 # Created by: PyQt5 UI code generator 5.15.4
 #
 # WARNING: Any manual changes made to this file will be lost when pyuic5 is
-# run again.  
+# run again.
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -25,76 +25,84 @@ class Ui_MainMenu(object):
         spacerItem = QtWidgets.QSpacerItem(
             20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem)
-        self.Add = QtWidgets.QPushButton(MainMenu)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.Add.sizePolicy().hasHeightForWidth())
-        self.Add.setSizePolicy(sizePolicy)
-        font = QtGui.QFont()
-        font.setPointSize(14)
-        font.setBold(True)
-        font.setWeight(75)
-        self.Add.setFont(font)
-        self.Add.setAutoFillBackground(False)
-        self.Add.setStyleSheet("border: bold")
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(
-            ":/img/kisspng-computer-icons-download-button-symbol-plus-5abd9e3ed95b29.3600526615223762548903-removebg-preview.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.Add.setIcon(icon)
-        self.Add.setIconSize(QtCore.QSize(50, 50))
-        self.Add.setAutoDefault(True)
-        self.Add.setDefault(True)
-        self.Add.setObjectName("Add")
-        self.verticalLayout.addWidget(
-            self.Add, 0, QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
-        self.Run = QtWidgets.QPushButton(MainMenu)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.Run.sizePolicy().hasHeightForWidth())
-        self.Run.setSizePolicy(sizePolicy)
-        font = QtGui.QFont()
-        font.setPointSize(14)
-        font.setBold(True)
-        font.setWeight(75)
-        self.Run.setFont(font)
-        self.Run.setStyleSheet("border: bold\n"
-                               "")
-        icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(
-            ":/img/run-removebg-preview.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.Run.setIcon(icon1)
-        self.Run.setIconSize(QtCore.QSize(50, 50))
-        self.Run.setAutoDefault(True)
-        self.Run.setDefault(True)
-        self.Run.setObjectName("Run")
-        self.verticalLayout.addWidget(
-            self.Run, 0, QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
-        self.Settings = QtWidgets.QPushButton(MainMenu)
+        self.add_files_button = QtWidgets.QPushButton(MainMenu)
+        self.add_files_button.setCursor(
+            QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(
-            self.Settings.sizePolicy().hasHeightForWidth())
-        self.Settings.setSizePolicy(sizePolicy)
+            self.add_files_button.sizePolicy().hasHeightForWidth())
+        self.add_files_button.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setPointSize(14)
         font.setBold(True)
         font.setWeight(75)
-        self.Settings.setFont(font)
-        self.Settings.setStyleSheet("border: bold")
+        self.add_files_button.setFont(font)
+        self.add_files_button.setAutoFillBackground(False)
+        self.add_files_button.setStyleSheet("border: bold")
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(
+            ":/img/kisspng-computer-icons-download-button-symbol-plus-5abd9e3ed95b29.3600526615223762548903-removebg-preview.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.add_files_button.setIcon(icon)
+        self.add_files_button.setIconSize(QtCore.QSize(50, 50))
+        self.add_files_button.setAutoDefault(True)
+        self.add_files_button.setDefault(True)
+        self.add_files_button.setObjectName("Add")
+        self.verticalLayout.addWidget(
+            self.add_files_button, 0, QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+        self.run_analysis_button = QtWidgets.QPushButton(MainMenu)
+        self.run_analysis_button.setCursor(
+            QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(
+            self.run_analysis_button.sizePolicy().hasHeightForWidth())
+        self.run_analysis_button.setSizePolicy(sizePolicy)
+        font = QtGui.QFont()
+        font.setPointSize(14)
+        font.setBold(True)
+        font.setWeight(75)
+        self.run_analysis_button.setFont(font)
+        self.run_analysis_button.setStyleSheet("border: bold\n"
+                                               "")
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap(
+            ":/img/run-removebg-preview.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.run_analysis_button.setIcon(icon1)
+        self.run_analysis_button.setIconSize(QtCore.QSize(50, 50))
+        self.run_analysis_button.setAutoDefault(True)
+        self.run_analysis_button.setDefault(True)
+        self.run_analysis_button.setObjectName("Run")
+        self.verticalLayout.addWidget(
+            self.run_analysis_button, 0, QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+        self.settings_button = QtWidgets.QPushButton(MainMenu)
+        self.settings_button.setCursor(
+            QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(
+            self.settings_button.sizePolicy().hasHeightForWidth())
+        self.settings_button.setSizePolicy(sizePolicy)
+        font = QtGui.QFont()
+        font.setPointSize(14)
+        font.setBold(True)
+        font.setWeight(75)
+        self.settings_button.setFont(font)
+        self.settings_button.setStyleSheet("border: bold")
         icon2 = QtGui.QIcon()
         icon2.addPixmap(QtGui.QPixmap(
             ":/img/download__3_-removebg-preview.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.Settings.setIcon(icon2)
-        self.Settings.setIconSize(QtCore.QSize(50, 50))
-        self.Settings.setObjectName("Settings")
+        self.settings_button.setIcon(icon2)
+        self.settings_button.setIconSize(QtCore.QSize(50, 50))
+        self.settings_button.setObjectName("Settings")
         self.verticalLayout.addWidget(
-            self.Settings, 0, QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+            self.settings_button, 0, QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
         spacerItem1 = QtWidgets.QSpacerItem(
             20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem1)
@@ -106,9 +114,12 @@ class Ui_MainMenu(object):
     def retranslateUi(self, MainMenu):
         _translate = QtCore.QCoreApplication.translate
         MainMenu.setWindowTitle(_translate("MainMenu", "Form"))
-        self.Add.setText(_translate("MainMenu", "  Add Files"))
-        self.Run.setText(_translate("MainMenu", "  Run Analysis"))
-        self.Settings.setText(_translate("MainMenu", "  Settings"))
+        self.add_files_button.setText(_translate(
+            "MainMenu", "Add Files"))
+        self.run_analysis_button.setText(_translate(
+            "MainMenu", "Run Analysis"))
+        self.settings_button.setText(
+            _translate("MainMenu", "Settings"))
 
 
 if __name__ == "__main__":
