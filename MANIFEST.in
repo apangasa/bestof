@@ -1,1 +1,1 @@
-include bestOf/backend/saved_models/*.pth
+include bestOf/backend/saved_models/*.pth bestOf/backend/settings.json
