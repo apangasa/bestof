@@ -119,7 +119,8 @@ class Ui_MainWindow(QWidget):
         self.progressChangedSignal.connect(self.changeProgress)
         self.statusChangedSignal.connect(self.changeStatus)
 
-        self.Status.setText("Waiting for uploading")
+        self.Status.setText(
+            "Start by Uploading Images. Click Add Files above!")
         self.Ui_MainMenu.add_files_button.clicked.connect(self.getFiles)
 
     def retranslateUi(self, MainWindow):
@@ -144,7 +145,7 @@ class Ui_MainWindow(QWidget):
         if len(file[0]) == 0:
             self.changeStatus("No files selected", "red")
             return
-        self.changeStatus("Loading...")
+        self.changeStatus("Reading images...")
         thread = Thread(target=self.loadFiles, args=(file,))
         thread.start()
 
@@ -225,7 +226,8 @@ class Ui_MainWindow(QWidget):
         final = sorted(final, key=lambda x: x[2], reverse=True)
         print(final)
         IMAGELIST = final
-        self.statusChangedSignal.emit("Successfully loaded", "green")
+        self.statusChangedSignal.emit(
+            "Successfully loaded images! Check Settings, then click Run Analysis to process your images.", "green")
 
 
 if __name__ == "__main__":
