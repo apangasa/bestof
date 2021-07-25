@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 import sys
 import numpy as np
+import json
 import os
 print("Starting...")
 
@@ -17,12 +18,29 @@ import bestOf.backend.cropDetector as cropDetector
 import bestOf.backend.evaluateSharpness as evaluateSharpness
 import bestOf.backend.identifyPeople as identifyPeople
 import bestOf.backend.evaluateCentering as evaluateCentering
+import bestOf.backend.sitePackagePathConstructor as sitePackagePathConstructor
 
 
 def loadImages(filenames):
     for filename in filenames:
         image = identifyPeople.read_img(filename)
         yield (image * 255).astype(np.uint8)[:, :, :3] if 'png' in filename else image
+
+
+def read_settings():
+    path = sitePackagePathConstructor.get_site_package_path(
+        './bestOf/backend/settings.json')
+    settings = {}
+    with open(path, 'r') as settings_file:
+        settings = json.load(settings_file)
+    return settings
+
+
+def write_settings(settings):
+    path = sitePackagePathConstructor.get_site_package_path(
+        './bestOf/backend/settings.json')
+    with open(path, 'w') as settings_file:
+        json.dump(settings, settings_file)
 
 
 IMAGELIST = []
@@ -80,10 +98,10 @@ def main():
 
             # Criteria should be populated from settings selections
             criteria = {
-                'sharpness': True,
-                'centering': True,
-                'lighting': False,
-                'resolution': False
+                'sharpness': 1,
+                'centering': 1,
+                'lighting': 0,
+                'resolution': 0
             }
 
             if criteria['sharpness']:
@@ -158,10 +176,19 @@ def main():
             self.setGeometry(1550, 800, 500, 500)
             self.nextWindow = settingsMenu()
             self.process = processingResults()
+
+            self.criteria_settings = read_settings()
+            print(self.criteria_settings)
+
+            # self.progress = QProgressBar(self)
+            # self.progress.setGeometry()
             self.makeUI()
             self.layout = QVBoxLayout()
             self.layout.addWidget(self.firstText)
             self.setLayout(self.layout)
+
+        def closeEvent(self, event):
+            write_settings(self.criteria_settings)
 
         def makeUI(self):
             self.firstText = QGroupBox("Welcome, browse your computer for images to start picture analysis.",
@@ -189,6 +216,10 @@ def main():
             layout = QVBoxLayout
             image_generator = loadImages(list(file[0]))
             vectors = []
+
+            # self.criteria_settings['sharpness'] = 2
+            # self.criteria_settings['resolution'] = 3
+
             for image in image_generator:
                 v = similarity.generate_feature_vector(image)
                 vectors.append(v)
