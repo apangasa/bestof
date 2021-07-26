@@ -7,6 +7,7 @@
 # WARNING: Any manual changes made to this file will be lost when pyuic5 is
 # run again.
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
@@ -54,9 +55,7 @@ class Ui_MainMenu(object):
         self.verticalLayout_3.setContentsMargins(100, -1, -1, -1)
         self.verticalLayout_3.setSpacing(40)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
-        self.add_files_button = QtWidgets.QPushButton(MainMenu)
-        self.add_files_button.setCursor(
-            QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.Add = QtWidgets.QPushButton(MainMenu)
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
