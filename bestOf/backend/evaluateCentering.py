@@ -20,3 +20,14 @@ def evaluate_centering(bounds_list, image):
     max_dist = math.sqrt((center[0] ** 2) + (center[1] ** 2))
 
     return max_dist - (total_dist / len(bounds_list)) / max_dist if len(bounds_list) and max_dist else None
+
+
+def normalize_centering_scores(group_scores):
+    max_val = max(group_scores)
+
+    if not max_val:
+        return [1.0] * len(group_scores)
+
+    normalized_scores = [float(score) / float(max_val)
+                         for score in group_scores]
+    return normalized_scores
