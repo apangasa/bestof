@@ -8,6 +8,10 @@ FACE_DETECTOR = mp.solutions.face_detection.FaceDetection(
     model_selection=1, min_detection_confidence=0.7)
 
 
+def array_is_subset(superarray, subarray):
+    return set(np.unique(subarray)).issubset(set(np.unique(superarray)))
+
+
 def read_img(filename):
     return plt.imread(filename)
 
@@ -44,10 +48,41 @@ def segment_image(image, n=4):
 
     for i in range(n):
         for j in range(n):
-            seg = image[i * delta_h:(i + 1) * delta_h,
-                        j * delta_w:(j + 1) * delta_w]
+            seg = image[int(i * delta_h):int((i + 1) * delta_h),
+                        int(j * delta_w):int((j + 1) * delta_w)]
             subs, _ = crop_subjects(np.copy(seg, order='K'))
             all_subjects.extend(subs)
+
+    intermediate_range = [
+        element + 0.5 for element in range(n) if element != n - 1]
+
+    print(intermediate_range)
+
+    for i in intermediate_range:
+        for j in range(n):
+            seg = image[int(i * delta_h):int((i + 1) * delta_h),
+                        int(j * delta_w):int((j + 1) * delta_w)]
+            subs, _ = crop_subjects(np.copy(seg, order='K'))
+
+            for sub in subs:
+                for existing_sub in all_subjects:
+                    if array_is_subset(existing_sub, sub[0:int(sub.shape[0] / 4), 0:int(sub.shape[1] / 4)]):
+                        break
+                else:
+                    all_subjects.append(sub)
+
+    for i in range(n):
+        for j in intermediate_range:
+            seg = image[int(i * delta_h):int((i + 1) * delta_h),
+                        int(j * delta_w):int((j + 1) * delta_w)]
+            subs, _ = crop_subjects(np.copy(seg, order='K'))
+
+            for sub in subs:
+                for existing_sub in all_subjects:
+                    if array_is_subset(existing_sub, sub[0:int(sub.shape[0] / 4), 0:int(sub.shape[1] / 4)]):
+                        break
+                else:
+                    all_subjects.append(sub)
 
     if n == 1:
         return all_subjects
@@ -169,7 +204,7 @@ def get_eye_frame_from_img(filename):
 def main():
     img = read_img('./bestOf/resources/examples/IMG_1663.jpg')
     show_img(img)
-    subs = segment_image(img, n=12)
+    subs = segment_image(img, n=10)
 
     for sub in subs:
         show_img(sub)
