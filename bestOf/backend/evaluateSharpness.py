@@ -1,6 +1,6 @@
 import cv2 as cv
 import numpy as np
-import bestOf.backend.identifyPeople
+import bestOf.backend.identifyPeople as identifyPeople
 
 
 def apply_kernel(image, a=-4, b=1, c=0):
