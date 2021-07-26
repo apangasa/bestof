@@ -36,7 +36,7 @@ def detect_faces(image):
     return FACE_DETECTOR.process(image).detections
 
 
-def segment_image(image, n=4):
+def crop_subjects_from_segmented_image(image, n=8):
     im_height, im_width, _ = image.shape
 
     delta_h = int(im_height / n)
@@ -45,13 +45,27 @@ def segment_image(image, n=4):
     print(delta_h, delta_w)
 
     all_subjects = []
+    all_bounds = []
 
     for i in range(n):
         for j in range(n):
             seg = image[int(i * delta_h):int((i + 1) * delta_h),
                         int(j * delta_w):int((j + 1) * delta_w)]
-            subs, _ = crop_subjects(np.copy(seg, order='K'))
+            subs, bounds_list = crop_subjects(np.copy(seg, order='K'))
+            for bounds in bounds_list:
+                bounds.xmin = (int(j * delta_w) +
+                               (bounds.xmin * bounds.width)) / im_width
+                bounds.ymin = (int(i * delta_h) +
+                               (bounds.ymin * bounds.height)) / im_height
+
+                seg_width = int((j + 1) * delta_w) - int(j * delta_w)
+                seg_height = int((i + 1) * delta_h) - int(i * delta_h)
+
+                bounds.width = bounds.width * seg_width / im_width
+                bounds.height = bounds.height * seg_height / im_height
+
             all_subjects.extend(subs)
+            all_bounds.extend(bounds_list)
 
     intermediate_range = [
         element + 0.5 for element in range(n) if element != n - 1]
@@ -62,36 +76,39 @@ def segment_image(image, n=4):
         for j in range(n):
             seg = image[int(i * delta_h):int((i + 1) * delta_h),
                         int(j * delta_w):int((j + 1) * delta_w)]
-            subs, _ = crop_subjects(np.copy(seg, order='K'))
+            subs, bounds_list = crop_subjects(np.copy(seg, order='K'))
 
-            for sub in subs:
+            for idx, sub in enumerate(subs):
                 for existing_sub in all_subjects:
                     if array_is_subset(existing_sub, sub[0:int(sub.shape[0] / 4), 0:int(sub.shape[1] / 4)]):
                         break
                 else:
                     all_subjects.append(sub)
+                    all_bounds.append(bounds_list[idx])
 
     for i in range(n):
         for j in intermediate_range:
             seg = image[int(i * delta_h):int((i + 1) * delta_h),
                         int(j * delta_w):int((j + 1) * delta_w)]
-            subs, _ = crop_subjects(np.copy(seg, order='K'))
+            subs, bounds_list = crop_subjects(np.copy(seg, order='K'))
 
-            for sub in subs:
+            for idx, sub in enumerate(subs):
                 for existing_sub in all_subjects:
                     if array_is_subset(existing_sub, sub[0:int(sub.shape[0] / 4), 0:int(sub.shape[1] / 4)]):
                         break
                 else:
                     all_subjects.append(sub)
+                    all_bounds.append(bounds_list[idx])
 
     if n == 1:
-        return all_subjects
+        return all_subjects, all_bounds
     else:
-        larger_scale_subjects = segment_image(image, n=n - 1)
+        larger_scale_subjects, larger_scale_bounds = crop_subjects_from_segmented_image(
+            image, n=n - 1)
         if len(larger_scale_subjects) >= len(all_subjects):
-            return larger_scale_subjects
+            return larger_scale_subjects, larger_scale_bounds
         else:
-            return all_subjects
+            return all_subjects, all_bounds
 
 
 def get_subject_bounds(face_info):
@@ -204,7 +221,7 @@ def get_eye_frame_from_img(filename):
 def main():
     img = read_img('./bestOf/resources/examples/IMG_1663.jpg')
     show_img(img)
-    subs = segment_image(img, n=10)
+    subs = crop_subjects_from_segmented_image(img, n=10)
 
     for sub in subs:
         show_img(sub)
