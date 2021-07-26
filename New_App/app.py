@@ -1,20 +1,20 @@
-# -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'app1.ui'
-#
-# Created by: PyQt5 UI code generator 5.15.4
-#
-# WARNING: Any manual changes made to this file will be lost when pyuic5 is
-# run again.
 from PyQt5.QtGui import *
 import sys
 import numpy as np
+
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QFileDialog
+from torch._C import layout
 import res
-from PyQt5.QtWidgets import QWidget, QFileDialog
-from PyQt5 import QtCore, QtGui, QtWidgets
+import json
+from analyzing_page import Ui_AnalyzingPage
+from main import Ui_MainWindow
+from menu import Ui_MainMenu
+from settings import Ui_Settings
+from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5 import QtCore
 from threading import Thread
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
-import menu
+import time
 
 import bestOf.backend.similarity as similarity
 import bestOf.backend.blinkDetector as blinkDetector
@@ -22,6 +22,23 @@ import bestOf.backend.cropDetector as cropDetector
 import bestOf.backend.evaluateSharpness as evaluateSharpness
 import bestOf.backend.identifyPeople as identifyPeople
 import bestOf.backend.evaluateCentering as evaluateCentering
+import bestOf.backend.sitePackagePathConstructor as sitePackagePathConstructor
+
+
+def read_settings():
+    path = sitePackagePathConstructor.get_site_package_path(
+        './bestOf/backend/settings.json')
+    settings = {}
+    with open(path, 'r') as settings_file:
+        settings = json.load(settings_file)
+    return settings
+
+
+def write_settings(settings):
+    path = sitePackagePathConstructor.get_site_package_path(
+        './bestOf/backend/settings.json')
+    with open(path, 'w') as settings_file:
+        json.dump(settings, settings_file)
 
 
 def loadImages(filenames):
@@ -30,133 +47,147 @@ def loadImages(filenames):
         yield (image * 255).astype(np.uint8)[:, :, :3] if 'png' in filename else image
 
 
-IMAGELIST = []
-GROUPS = []
+def simulateAnalyzing(imagelist, groups, settings, callback):
+    imagelistLen = len(imagelist)
+
+    maxProgress = 0
+    maxProgress += min(1, settings["sharpness"]) * imagelistLen
+    maxProgress += min(1, settings["centering"]) * imagelistLen
+    maxProgress += min(1, settings["lighting"]) * imagelistLen
+    maxProgress += min(1, settings["resolution"]) * imagelistLen
+    progress = 0
+
+    if settings["sharpness"]:
+        for group in groups:
+            for index in group:
+                for item in imagelist:
+                    if item[0] == index:
+                        time.sleep(0.1)  # Analyze sharpness
+                        progress += 1
+                        callback("sharpness", item[1], int(
+                            progress / maxProgress * 100))
+
+    if settings["centering"]:
+        for group in groups:
+            for index in group:
+                for item in imagelist:
+                    if item[0] == index:
+                        time.sleep(0.1)  # Analyze centering
+                        progress += 1
+                        callback("centering", item[1], int(
+                            progress / maxProgress * 100))
+
+    if settings["lighting"]:
+        for group in groups:
+            for index in group:
+                for item in imagelist:
+                    if item[0] == index:
+                        time.sleep(0.1)  # Analyze lighting
+                        progress += 1
+                        callback("lighting", item[1], int(
+                            progress / maxProgress * 100))
+
+    if settings["resolution"]:
+        for group in groups:
+            for index in group:
+                for item in imagelist:
+                    if item[0] == index:
+                        time.sleep(0.1)  # Analyze resolution
+                        progress += 1
+                        callback("resolution", item[1], int(
+                            progress / maxProgress * 100))
+
+    return groups  # should return sorted groups
 
 
-class Ui_MainWindow(QWidget):
+class BestOfApp(QObject):
     progressChangedSignal = pyqtSignal(int)
     statusChangedSignal = pyqtSignal(str, str)
+    analyzingCriteriaChangedSignal = pyqtSignal(str)
+    analyzingImageChangedSignal = pyqtSignal(str)
+    analyzingFinishedSignal = pyqtSignal()
 
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(773, 574)
-        MainWindow.setStyleSheet("background-color: white;")
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
-        self.centralwidget.setObjectName("centralwidget")
-        self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
-        self.gridLayout.setContentsMargins(0, 0, 0, 0)
-        self.gridLayout.setSpacing(0)
-        self.gridLayout.setObjectName("gridLayout")
-        self.verticalLayout = QtWidgets.QVBoxLayout()
-        self.verticalLayout.setSizeConstraint(
-            QtWidgets.QLayout.SetNoConstraint)
-        self.verticalLayout.setContentsMargins(-1, -1, -1, 5)
-        self.verticalLayout.setSpacing(0)
-        self.verticalLayout.setObjectName("verticalLayout")
-        self.stackedWidget = QtWidgets.QStackedWidget(self.centralwidget)
-        self.stackedWidget.setObjectName("stackedWidget")
-        self.verticalLayout.addWidget(self.stackedWidget)
-        self.frame = QtWidgets.QFrame(self.centralwidget)
-        self.frame.setEnabled(True)
-        self.frame.setMaximumSize(QtCore.QSize(16777215, 2))
-        self.frame.setMinimumSize(QtCore.QSize(0, 2))
-        self.frame.setStyleSheet("background: black;")
-        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame.setObjectName("frame")
-        self.verticalLayout.setSpacing(4)
-        self.verticalLayout.addWidget(self.frame)
-        self.horizontalLayout = QtWidgets.QHBoxLayout()
-        self.horizontalLayout.setContentsMargins(10, -1, 10, -1)
-        self.horizontalLayout.setSpacing(16)
-        self.horizontalLayout.setObjectName("horizontalLayout")
-        self.Status = QtWidgets.QLabel(self.centralwidget)
-        font = QtGui.QFont()
-        font.setFamily("MS Shell Dlg 2")
-        font.setPointSize(12)
-        self.Status.setFont(font)
-        self.Status.setAlignment(
-            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
-        self.Status.setObjectName("Status")
-        self.horizontalLayout.addWidget(self.Status)
-        self.progressBar = QtWidgets.QProgressBar(self.centralwidget)
-        self.progressBar.setEnabled(True)
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.progressBar.setFont(font)
-        self.progressBar.setStyleSheet("QProgressBar {\n"
-                                       "    border: 2px solid black;\n"
-                                       "   text-align: center;\n"
-                                       "}\n"
-                                       "\n"
-                                       "QProgressBar::chunk {\n"
-                                       "    background-color: #1976D3;\n"
-                                       "    width: 20px;\n"
-                                       "}")
-        self.progressBar.setProperty("value", 0)
-        self.progressBar.setTextVisible(True)
-        self.progressBar.setTextDirection(QtWidgets.QProgressBar.TopToBottom)
-        self.progressBar.setObjectName("progressBar")
-        self.horizontalLayout.addWidget(self.progressBar)
-        self.verticalLayout.addLayout(self.horizontalLayout)
-        self.gridLayout.addLayout(self.verticalLayout, 0, 1, 3, 1)
-        MainWindow.setCentralWidget(self.centralwidget)
-
-        self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(-1)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
-
-        self.MainMenu = QtWidgets.QWidget()
-        self.Ui_MainMenu = menu.Ui_MainMenu()
+    def __init__(self):
+        super().__init__()
+        self.MainWindow = QMainWindow()
+        self.Ui_MainWindow = Ui_MainWindow()
+        self.Ui_MainWindow.setupUi(self.MainWindow)
+        self.MainMenu = QWidget()
+        self.Ui_MainMenu = Ui_MainMenu()
         self.Ui_MainMenu.setupUi(self.MainMenu)
+        self.Settings = QWidget()
+        self.Ui_Settings = Ui_Settings()
+        self.Ui_Settings.setupUi(self.Settings)
+        self.AnalyzingPage = QWidget()
+        self.Ui_AnalyzingPage = Ui_AnalyzingPage()
+        self.Ui_AnalyzingPage.setupUi(self.AnalyzingPage)
 
-        self.stackedWidget.addWidget(self.MainMenu)
+        self.MainWindow.installEventFilter(self)
 
-        self.progressBar.setVisible(False)
-        self.progressChangedSignal.connect(self.changeProgress)
-        self.statusChangedSignal.connect(self.changeStatus)
+        self.Ui_MainWindow.stackedWidget.addWidget(self.MainMenu)
+        self.Ui_MainWindow.stackedWidget.addWidget(self.Settings)
+        self.Ui_MainWindow.stackedWidget.addWidget(self.AnalyzingPage)
 
-        self.Status.setText(
-            "Start by Uploading Images. Click Add Files above!")
-        self.Ui_MainMenu.add_files_button.clicked.connect(self.getFiles)
+        self.Ui_MainWindow.progressBar.setVisible(False)
 
-    def retranslateUi(self, MainWindow):
-        _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.Status.setText(_translate("MainWindow", "Status"))
+        self.Ui_Settings.criteriaChangedSignal.connect(self.onCriteriaChanged)
+        self.Ui_Settings.thresholdChangedSignal.connect(
+            self.onThresholdChanged)
 
-    def changeProgress(self, progress):
-        self.progressBar.setProperty("value", progress)
-        if progress == 0 or progress == 100:
-            self.progressBar.setVisible(False)
-        else:
-            self.progressBar.setVisible(True)
+        self.Ui_MainMenu.Add.clicked.connect(self.getFiles)
+        self.Ui_MainMenu.Run.clicked.connect(self.analyzeImages)
 
-    def changeStatus(self, status, color="black"):
-        self.Status.setText(status)
-        self.Status.setStyleSheet("color: %s;" % color)
+        self.Ui_MainMenu.Settings.clicked.connect(
+            lambda: self.Ui_MainWindow.stackedWidget.setCurrentIndex(1))
+        self.Ui_Settings.Back.clicked.connect(
+            lambda: self.Ui_MainWindow.stackedWidget.setCurrentIndex(0))
+
+        self.analyzingCriteriaChangedSignal.connect(
+            self.Ui_AnalyzingPage.setCriteria)
+        self.analyzingImageChangedSignal.connect(
+            self.Ui_AnalyzingPage.setImage)
+        self.progressChangedSignal.connect(self.Ui_MainWindow.changeProgress)
+        self.statusChangedSignal.connect(self.Ui_MainWindow.changeStatus)
+        self.analyzingFinishedSignal.connect(self.onAnalyzingFinished)
+
+        self.settings = read_settings()
+        self.Ui_Settings.setSettings(self.settings)
+
+        self.imageList = []
+        self.groups = []
+
+        self.MainWindow.show()
+
+    def onCriteriaChanged(self, criteria, value):
+        self.settings[criteria] = value
+
+    def onThresholdChanged(self, value):
+        self.settings["threshold"] = value
+
+    def eventFilter(self, obj, event):
+        if event.type() == QtCore.QEvent.Close:
+            write_settings(self.settings)
+        return super().eventFilter(obj, event)
 
     def getFiles(self):
         file = QFileDialog.getOpenFileNames(
-            self, 'Add Files', QtCore.QDir.currentPath(), "Image Files (*.png *.jpg)")
+            self.MainWindow, 'Add Files', QtCore.QDir.currentPath(), "Image Files (*.png *.jpg)")
         if len(file[0]) == 0:
-            self.changeStatus("No files selected", "red")
+            self.Ui_MainWindow.changeStatus("No files selected", "red")
             return
-        self.changeStatus("Reading images...")
+        self.Ui_MainWindow.changeStatus("Reading images...")
         thread = Thread(target=self.loadFiles, args=(file,))
         thread.start()
 
     def loadFiles(self, file):
-        global IMAGELIST
-        global GROUPS
-
         maxProgress = len(file[0]) * 2
         progress = 0
 
-        image_generator = loadImages(list(file[0]))
+        loaded = []
+        if len(self.imageList):
+            loaded = [item[1] for item in self.imageList]
+
+        image_generator = loadImages(list(file[0]) + loaded)
         vectors = []
         for image in image_generator:
             v = similarity.generate_feature_vector(image)
@@ -166,8 +197,7 @@ class Ui_MainWindow(QWidget):
 
         threshold = 0.8  # this should be grabbed from whatever the user set it to in the settings
         groups = similarity.group(vectors, threshold=threshold)
-        # print(groups)
-        GROUPS = groups
+        self.groups = groups
 
         image_generator = loadImages(list(file[0]))
 
@@ -201,7 +231,8 @@ class Ui_MainWindow(QWidget):
             if len(subjects) == 0:
                 default_scores.append(0)
                 progress += 1
-                self.progressChangedSignal.emit(progress / maxProgress * 100)
+                self.progressChangedSignal.emit(
+                    int(progress / maxProgress * 100))
                 continue
 
             blink_score = (len(subjects) - blinks) / len(subjects)
@@ -211,30 +242,55 @@ class Ui_MainWindow(QWidget):
             default_scores.append(default_score)
 
             progress += 1
-            self.progressChangedSignal.emit(progress / maxProgress * 100)
+            self.progressChangedSignal.emit(int(progress / maxProgress * 100))
 
-        if len(IMAGELIST):
-            max_index = max([elem[0] for elem in IMAGELIST])
+        if len(self.imageList):
+            max_index = max([elem[0] for elem in self.imageList])
         else:
             max_index = -1
 
         final = zip(
             range(max_index + 1, max_index + 1 + len(file[0])), file[0], default_scores, subject_sharpness_scores, centering_scores)
 
-        if len(IMAGELIST):
-            final = list(final) + IMAGELIST
+        if len(self.imageList):
+            final = list(final) + self.imageList
         final = sorted(final, key=lambda x: x[2], reverse=True)
         print(final)
-        IMAGELIST = final
+        self.imageList = final
         self.statusChangedSignal.emit(
             "Successfully loaded images! Check Settings, then click Run Analysis to process your images.", "green")
+
+    def analyzeImages(self):
+        if len(self.imageList) == 0:
+            self.Ui_MainWindow.changeStatus(
+                "Images not loaded, upload images first", "red")
+            return
+        self.Ui_MainWindow.changeStatus("Analyzing...")
+        self.Ui_MainWindow.stackedWidget.setCurrentIndex(2)
+        thread = Thread(target=self.analyzingThread)
+        thread.start()
+
+    def analyzingThread(self):
+        self.groups = simulateAnalyzing(self.imageList, self.groups,
+                                        self.settings, self.analyzingCallback)
+        self.analyzingFinishedSignal.emit()
+
+    def analyzingCallback(self, criteria, image, progress):
+        self.analyzingCriteriaChangedSignal.emit(criteria)
+        self.analyzingImageChangedSignal.emit(image)
+        self.progressChangedSignal.emit(progress)
+
+    def onAnalyzingFinished(self):
+        self.Ui_MainWindow.changeStatus(
+            "Analyzing finished successfully", "green")
+        # self.Ui_MainWindow.stackedWidget.setCurrentIndex(3) - switch to results view
+        # self.Ui_ResultsView.display(self.imageList, self.groups) - display results
+        self.Ui_MainWindow.stackedWidget.setCurrentIndex(
+            0)  # for now, just back to the main menu
 
 
 if __name__ == "__main__":
     import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
+    app = QApplication(sys.argv)
+    bestOfApp = BestOfApp()
     sys.exit(app.exec_())
