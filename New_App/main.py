@@ -99,7 +99,8 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.Status.setText(_translate("MainWindow", "Waiting for uploading"))
+        self.Status.setText(_translate(
+            "MainWindow", "Start by Uploading Images. Click Add Files above!"))
 
     def changeProgress(self, progress):
         self.progressBar.setProperty("value", progress)
@@ -108,7 +109,7 @@ class Ui_MainWindow(object):
         else:
             self.progressBar.setVisible(True)
 
-    def changeStatus(self, status, color="black"):
+    def changeStatus(self, status, color="#1d1e1f"):
         self.Status.setText(status)
         self.Status.setStyleSheet("color: %s;" % color)
 
