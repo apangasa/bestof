@@ -11,6 +11,16 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
+def clearLayout(layout):
+    if layout is not None:
+        while layout.count():
+            child = layout.takeAt(0)
+            if child.widget() is not None:
+                child.widget().deleteLater()
+            elif child.layout() is not None:
+                clearLayout(child.layout())
+
+
 class SelectableImage(QtWidgets.QLabel):
     toggled = QtCore.pyqtSignal(bool, int)
 
@@ -28,7 +38,10 @@ class SelectableImage(QtWidgets.QLabel):
         self.toggled.emit(self.selected, self.id)
 
 
-class Ui_Results(object):
+class Ui_Results(QtCore.QObject):
+    imageToggledSignal = QtCore.pyqtSignal(bool, int)
+    downloadSelectedSignal = QtCore.pyqtSignal()
+
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(696, 537)
@@ -81,10 +94,7 @@ class Ui_Results(object):
         self.Back.setText(_translate("Form", " Back"))
 
     def display(self, imageList, groups):
-        while self.verticalLayout.count():
-            child = self.verticalLayout.takeAt(0)
-            if child.widget():
-                child.widget().deleteLater()
+        clearLayout(self.verticalLayout)
 
         for pos, group in enumerate(groups):
             horizontalLayout = QtWidgets.QHBoxLayout()
@@ -110,6 +120,8 @@ class Ui_Results(object):
                         image.setSizePolicy(sizePolicy)
                         image.setPixmap(QtGui.QPixmap(item[1]).scaled(
                             200, 200, QtCore.Qt.KeepAspectRatio))
+                        image.toggled.connect(
+                            lambda s, i: self.imageToggledSignal.emit(s, i))
                         horizontalLayout.addWidget(image)
 
             spacer = QtWidgets.QSpacerItem(
@@ -135,7 +147,7 @@ class Ui_Results(object):
         Download.setStyleSheet(
             "color: #87CEEB; background: transparent; border: none;")
         Download.setText("Download Selected")
-
+        Download.clicked.connect(lambda: self.downloadSelectedSignal.emit())
         self.verticalLayout.addWidget(
             Download, 0, QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom)
 
@@ -148,3 +160,4 @@ if __name__ == "__main__":
     ui.setupUi(Form)
     Form.show()
     sys.exit(app.exec_())
+
