@@ -5,9 +5,9 @@ import numpy as np
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QFileDialog
 from torch._C import layout
+import res
 import json
 import collections
-import res
 from analyzing_page import Ui_AnalyzingPage
 from main import Ui_MainWindow
 from menu import Ui_MainMenu
@@ -17,9 +17,9 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5 import QtCore
 from threading import Thread
 import time
-
+import shutil
+import os
 sys.path.insert(1, 'bestOf/backend')
-
 
 import bestOf.backend.similarity as similarity
 import bestOf.backend.blinkDetector as blinkDetector
@@ -57,7 +57,6 @@ def simulateAnalyzing(filenames, imagelist, groups, settings, callback):
     imagelistLen = len(imagelist)
 
     maxProgress = 0
-    # sharpness iterates over images 3 times
     maxProgress += min(1, settings["sharpness"]) * imagelistLen * 3
     maxProgress += min(1, settings["centering"]) * imagelistLen
     maxProgress += min(1, settings["lighting"]) * imagelistLen
@@ -75,6 +74,7 @@ def simulateAnalyzing(filenames, imagelist, groups, settings, callback):
         sharpness_map, progress = createScoreMaps.create_sharpness_map(
             image_generator, imagelist, groups, callback, progress, maxProgress)
         print(sharpness_map)
+
 
     if settings["centering"]:
         centering_map, progress = createScoreMaps.create_centering_map(
@@ -145,6 +145,9 @@ class BestOfApp(QObject):
         self.Ui_MainMenu.Add.clicked.connect(self.getFiles)
         self.Ui_MainMenu.Run.clicked.connect(self.analyzeImages)
 
+        self.Ui_Results.imageToggledSignal.connect(self.onImageToggled)
+        self.Ui_Results.downloadSelectedSignal.connect(self.downloadSelected)
+
         self.Ui_MainMenu.Settings.clicked.connect(
             lambda: self.Ui_MainWindow.stackedWidget.setCurrentIndex(1))
         self.Ui_Settings.Back.clicked.connect(
@@ -166,6 +169,7 @@ class BestOfApp(QObject):
         self.filenames = []
         self.imageList = []
         self.groups = []
+        self.downloadingList = []
 
         self.MainWindow.show()
 
@@ -200,7 +204,6 @@ class BestOfApp(QObject):
 
         image_generator = loadImages(list(file[0]) + loaded)
         self.filenames = list(file[0])
-
         vectors = []
         for image in image_generator:
             v = similarity.generate_feature_vector(image)
@@ -208,10 +211,10 @@ class BestOfApp(QObject):
             progress += 1
             self.progressChangedSignal.emit(int(progress / maxProgress * 100))
 
-        self.Ui_MainWindow.changeStatus("Running default analysis...")
-        progress = 0
-        maxProgress = len(file[0])
-        self.progressChangedSignal.emit(int(progress / maxProgress * 100))
+            self.Ui_MainWindow.changeStatus("Running default analysis...")
+            progress = 0
+            maxProgress = len(file[0])
+            self.progressChangedSignal.emit(int(progress / maxProgress * 100))
 
         groups = similarity.group(
             vectors, threshold=self.settings["threshold"])
@@ -284,6 +287,7 @@ class BestOfApp(QObject):
             self.Ui_MainWindow.changeStatus(
                 "Nothing to process! Upload images by clicking the Add Files button.", "red")
             return
+        self.downloadingList = []
         self.Ui_MainWindow.changeStatus("Analyzing...")
         self.Ui_MainWindow.stackedWidget.setCurrentIndex(2)
         thread = Thread(target=self.analyzingThread)
@@ -306,7 +310,29 @@ class BestOfApp(QObject):
         self.Ui_Results.display(self.imageList, self.groups)
 
     def onImageToggled(self, selected, id):
-        pass
+        if selected:
+            self.downloadingList.append(id)
+        else:
+            self.downloadingList.remove(id)
+
+    def downloadSelected(self):
+        folder = QFileDialog.getExistingDirectory(
+            self.MainWindow, "Select Directory")
+        thread = Thread(target=self.downloadingThread, args=(folder,))
+        thread.start()
+
+    def downloadingThread(self, folder):
+        maxProgress = len(self.downloadingList)
+        progress = 0
+        for elem in self.imageList:
+            if elem[0] in self.downloadingList:
+                shutil.copyfile(elem[1], os.path.join(
+                    folder, os.path.basename(elem[1])))
+                progress += 1
+                self.progressChangedSignal.emit(
+                    int(progress / maxProgress * 100))
+
+        self.statusChangedSignal.emit("Downloading Finished", "green")
 
 
 if __name__ == "__main__":
