@@ -1,10 +1,11 @@
 import cv2 as cv
 import mediapipe as mp
 from matplotlib import pyplot as plt
+import numpy as np
 
 
 FACE_DETECTOR = mp.solutions.face_detection.FaceDetection(
-    model_selection=0, min_detection_confidence=0.5)
+    model_selection=1, min_detection_confidence=0.7)
 
 
 def read_img(filename):
@@ -29,6 +30,33 @@ def detect_faces(image):
         raise Exception('No image found.')
 
     return FACE_DETECTOR.process(image).detections
+
+
+def segment_image(image, n=4):
+    im_height, im_width, _ = image.shape
+
+    delta_h = int(im_height / n)
+    delta_w = int(im_width / n)
+
+    print(delta_h, delta_w)
+
+    all_subjects = []
+
+    for i in range(n):
+        for j in range(n):
+            seg = image[i * delta_h:(i + 1) * delta_h,
+                        j * delta_w:(j + 1) * delta_w]
+            subs, _ = crop_subjects(np.copy(seg, order='K'))
+            all_subjects.extend(subs)
+
+    if n == 1:
+        return all_subjects
+    else:
+        larger_scale_subjects = segment_image(image, n=n - 1)
+        if len(larger_scale_subjects) >= len(all_subjects):
+            return larger_scale_subjects
+        else:
+            return all_subjects
 
 
 def get_subject_bounds(face_info):
@@ -139,10 +167,16 @@ def get_eye_frame_from_img(filename):
 
 
 def main():
-    img = read_img('./bestOf/resources/examples/IMG_1663 - Copy.jpg')
-    subs, _ = crop_subjects(img)
+    img = read_img('./bestOf/resources/examples/IMG_1663.jpg')
+    show_img(img)
+    subs = segment_image(img, n=12)
+
     for sub in subs:
         show_img(sub)
+
+    # subs, _ = crop_subjects(img)
+    # for sub in subs:
+    #     show_img(sub)
 
 
 if __name__ == '__main__':
