@@ -11,7 +11,10 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_Settings(object):
+class Ui_Settings(QtCore.QObject):
+    criteriaChangedSignal = QtCore.pyqtSignal(str, int)
+    thresholdChangedSignal = QtCore.pyqtSignal(float)
+
     def setupUi(self, Settings):
         Settings.setObjectName("Settings")
         Settings.resize(898, 603)
@@ -32,6 +35,8 @@ class Ui_Settings(object):
         self.verticalLayout = QtWidgets.QVBoxLayout(Settings)
         self.verticalLayout.setObjectName("verticalLayout")
         self.Back = QtWidgets.QPushButton(Settings)
+        self.Back.setCursor(
+            QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -57,6 +62,20 @@ class Ui_Settings(object):
             20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem)
         self.frame = QtWidgets.QFrame(Settings)
+        self.frame.setStyleSheet("QRadioButton::indicator {\n"
+                                 "    width:10px;\n"
+                                 "    height:10px;\n"
+                                 "    border-radius: 8px;\n"
+                                 "    border: 3px solid #57AECB;\n"
+                                 "}\n"
+                                 "\n"
+                                 "QRadioButton::indicator:unchecked  {\n"
+                                 "    background: transparent;\n"
+                                 "}\n"
+                                 "\n"
+                                 "QRadioButton::indicator:checked  {\n"
+                                 "    background: #87CEEB;\n"
+                                 "}")
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -294,77 +313,21 @@ class Ui_Settings(object):
         self.SharpnessButtons.setObjectName("SharpnessButtons")
         self.sharpness_3 = QtWidgets.QRadioButton(self.SharpnessButtons)
         self.sharpness_3.setGeometry(QtCore.QRect(520, 0, 16, 17))
-        self.sharpness_3.setStyleSheet("QRadioButton::indicator {\n"
-                                       "    width:10px;\n"
-                                       "    height:10px;\n"
-                                       "    border-radius: 8px;\n"
-                                       "    border: 3px solid #57AECB;\n"
-                                       "}\n"
-                                       "\n"
-                                       "QRadioButton::indicator:unchecked  {\n"
-                                       "    background: transparent;\n"
-                                       "}\n"
-                                       "\n"
-                                       "QRadioButton::indicator:checked  {\n"
-                                       "    background: #87CEEB;\n"
-                                       "}")
         self.sharpness_3.setText("")
         self.sharpness_3.setChecked(False)
         self.sharpness_3.setObjectName("sharpness_3")
         self.sharpness_0 = QtWidgets.QRadioButton(self.SharpnessButtons)
         self.sharpness_0.setGeometry(QtCore.QRect(0, 0, 16, 17))
-        self.sharpness_0.setStyleSheet("QRadioButton::indicator {\n"
-                                       "    width:10px;\n"
-                                       "    height:10px;\n"
-                                       "    border-radius: 8px;\n"
-                                       "    border: 3px solid #57AECB;\n"
-                                       "}\n"
-                                       "\n"
-                                       "QRadioButton::indicator:unchecked  {\n"
-                                       "    background: transparent;\n"
-                                       "}\n"
-                                       "\n"
-                                       "QRadioButton::indicator:checked  {\n"
-                                       "    background: #87CEEB;\n"
-                                       "}")
         self.sharpness_0.setText("")
         self.sharpness_0.setChecked(True)
         self.sharpness_0.setObjectName("sharpness_0")
         self.sharpness_1 = QtWidgets.QRadioButton(self.SharpnessButtons)
         self.sharpness_1.setGeometry(QtCore.QRect(190, 0, 16, 17))
-        self.sharpness_1.setStyleSheet("QRadioButton::indicator {\n"
-                                       "    width:10px;\n"
-                                       "    height:10px;\n"
-                                       "    border-radius: 8px;\n"
-                                       "    border: 3px solid #57AECB;\n"
-                                       "}\n"
-                                       "\n"
-                                       "QRadioButton::indicator:unchecked  {\n"
-                                       "    background: transparent;\n"
-                                       "}\n"
-                                       "\n"
-                                       "QRadioButton::indicator:checked  {\n"
-                                       "    background: #87CEEB;\n"
-                                       "}")
         self.sharpness_1.setText("")
         self.sharpness_1.setChecked(False)
         self.sharpness_1.setObjectName("sharpness_1")
         self.sharpness_2 = QtWidgets.QRadioButton(self.SharpnessButtons)
         self.sharpness_2.setGeometry(QtCore.QRect(360, 0, 16, 17))
-        self.sharpness_2.setStyleSheet("QRadioButton::indicator {\n"
-                                       "    width:10px;\n"
-                                       "    height:10px;\n"
-                                       "    border-radius: 8px;\n"
-                                       "    border: 3px solid #57AECB;\n"
-                                       "}\n"
-                                       "\n"
-                                       "QRadioButton::indicator:unchecked  {\n"
-                                       "    background: transparent;\n"
-                                       "}\n"
-                                       "\n"
-                                       "QRadioButton::indicator:checked  {\n"
-                                       "    background: #87CEEB;\n"
-                                       "}")
         self.sharpness_2.setText("")
         self.sharpness_2.setChecked(False)
         self.sharpness_2.setObjectName("sharpness_2")
@@ -375,77 +338,21 @@ class Ui_Settings(object):
         self.CenteringButtons.setObjectName("CenteringButtons")
         self.centering_3 = QtWidgets.QRadioButton(self.CenteringButtons)
         self.centering_3.setGeometry(QtCore.QRect(520, 0, 16, 17))
-        self.centering_3.setStyleSheet("QRadioButton::indicator {\n"
-                                       "    width:10px;\n"
-                                       "    height:10px;\n"
-                                       "    border-radius: 8px;\n"
-                                       "    border: 3px solid #57AECB;\n"
-                                       "}\n"
-                                       "\n"
-                                       "QRadioButton::indicator:unchecked  {\n"
-                                       "    background: transparent;\n"
-                                       "}\n"
-                                       "\n"
-                                       "QRadioButton::indicator:checked  {\n"
-                                       "    background: #87CEEB;\n"
-                                       "}")
         self.centering_3.setText("")
         self.centering_3.setChecked(False)
         self.centering_3.setObjectName("centering_3")
         self.centering_0 = QtWidgets.QRadioButton(self.CenteringButtons)
         self.centering_0.setGeometry(QtCore.QRect(0, 0, 16, 17))
-        self.centering_0.setStyleSheet("QRadioButton::indicator {\n"
-                                       "    width:10px;\n"
-                                       "    height:10px;\n"
-                                       "    border-radius: 8px;\n"
-                                       "    border: 3px solid #57AECB;\n"
-                                       "}\n"
-                                       "\n"
-                                       "QRadioButton::indicator:unchecked  {\n"
-                                       "    background: transparent;\n"
-                                       "}\n"
-                                       "\n"
-                                       "QRadioButton::indicator:checked  {\n"
-                                       "    background: #87CEEB;\n"
-                                       "}")
         self.centering_0.setText("")
         self.centering_0.setChecked(True)
         self.centering_0.setObjectName("centering_0")
         self.centering_1 = QtWidgets.QRadioButton(self.CenteringButtons)
         self.centering_1.setGeometry(QtCore.QRect(190, 0, 16, 17))
-        self.centering_1.setStyleSheet("QRadioButton::indicator {\n"
-                                       "    width:10px;\n"
-                                       "    height:10px;\n"
-                                       "    border-radius: 8px;\n"
-                                       "    border: 3px solid #57AECB;\n"
-                                       "}\n"
-                                       "\n"
-                                       "QRadioButton::indicator:unchecked  {\n"
-                                       "    background: transparent;\n"
-                                       "}\n"
-                                       "\n"
-                                       "QRadioButton::indicator:checked  {\n"
-                                       "    background: #87CEEB;\n"
-                                       "}")
         self.centering_1.setText("")
         self.centering_1.setChecked(False)
         self.centering_1.setObjectName("centering_1")
         self.centering_2 = QtWidgets.QRadioButton(self.CenteringButtons)
         self.centering_2.setGeometry(QtCore.QRect(360, 0, 16, 17))
-        self.centering_2.setStyleSheet("QRadioButton::indicator {\n"
-                                       "    width:10px;\n"
-                                       "    height:10px;\n"
-                                       "    border-radius: 8px;\n"
-                                       "    border: 3px solid #57AECB;\n"
-                                       "}\n"
-                                       "\n"
-                                       "QRadioButton::indicator:unchecked  {\n"
-                                       "    background: transparent;\n"
-                                       "}\n"
-                                       "\n"
-                                       "QRadioButton::indicator:checked  {\n"
-                                       "    background: #87CEEB;\n"
-                                       "}")
         self.centering_2.setText("")
         self.centering_2.setChecked(False)
         self.centering_2.setObjectName("centering_2")
@@ -456,77 +363,21 @@ class Ui_Settings(object):
         self.LightingButtons.setObjectName("LightingButtons")
         self.lighting_3 = QtWidgets.QRadioButton(self.LightingButtons)
         self.lighting_3.setGeometry(QtCore.QRect(520, 0, 16, 17))
-        self.lighting_3.setStyleSheet("QRadioButton::indicator {\n"
-                                      "    width:10px;\n"
-                                      "    height:10px;\n"
-                                      "    border-radius: 8px;\n"
-                                      "    border: 3px solid #57AECB;\n"
-                                      "}\n"
-                                      "\n"
-                                      "QRadioButton::indicator:unchecked  {\n"
-                                      "    background: transparent;\n"
-                                      "}\n"
-                                      "\n"
-                                      "QRadioButton::indicator:checked  {\n"
-                                      "    background: #87CEEB;\n"
-                                      "}")
         self.lighting_3.setText("")
         self.lighting_3.setChecked(False)
         self.lighting_3.setObjectName("lighting_3")
         self.lighting_0 = QtWidgets.QRadioButton(self.LightingButtons)
         self.lighting_0.setGeometry(QtCore.QRect(0, 0, 16, 17))
-        self.lighting_0.setStyleSheet("QRadioButton::indicator {\n"
-                                      "    width:10px;\n"
-                                      "    height:10px;\n"
-                                      "    border-radius: 8px;\n"
-                                      "    border: 3px solid #57AECB;\n"
-                                      "}\n"
-                                      "\n"
-                                      "QRadioButton::indicator:unchecked  {\n"
-                                      "    background: transparent;\n"
-                                      "}\n"
-                                      "\n"
-                                      "QRadioButton::indicator:checked  {\n"
-                                      "    background: #87CEEB;\n"
-                                      "}")
         self.lighting_0.setText("")
         self.lighting_0.setChecked(True)
         self.lighting_0.setObjectName("lighting_0")
         self.lighting_1 = QtWidgets.QRadioButton(self.LightingButtons)
         self.lighting_1.setGeometry(QtCore.QRect(190, 0, 16, 17))
-        self.lighting_1.setStyleSheet("QRadioButton::indicator {\n"
-                                      "    width:10px;\n"
-                                      "    height:10px;\n"
-                                      "    border-radius: 8px;\n"
-                                      "    border: 3px solid #57AECB;\n"
-                                      "}\n"
-                                      "\n"
-                                      "QRadioButton::indicator:unchecked  {\n"
-                                      "    background: transparent;\n"
-                                      "}\n"
-                                      "\n"
-                                      "QRadioButton::indicator:checked  {\n"
-                                      "    background: #87CEEB;\n"
-                                      "}")
         self.lighting_1.setText("")
         self.lighting_1.setChecked(False)
         self.lighting_1.setObjectName("lighting_1")
         self.lighting_2 = QtWidgets.QRadioButton(self.LightingButtons)
         self.lighting_2.setGeometry(QtCore.QRect(360, 0, 16, 17))
-        self.lighting_2.setStyleSheet("QRadioButton::indicator {\n"
-                                      "    width:10px;\n"
-                                      "    height:10px;\n"
-                                      "    border-radius: 8px;\n"
-                                      "    border: 3px solid #57AECB;\n"
-                                      "}\n"
-                                      "\n"
-                                      "QRadioButton::indicator:unchecked  {\n"
-                                      "    background: transparent;\n"
-                                      "}\n"
-                                      "\n"
-                                      "QRadioButton::indicator:checked  {\n"
-                                      "    background: #87CEEB;\n"
-                                      "}")
         self.lighting_2.setText("")
         self.lighting_2.setChecked(False)
         self.lighting_2.setObjectName("lighting_2")
@@ -537,77 +388,21 @@ class Ui_Settings(object):
         self.ResolutionButtons.setObjectName("ResolutionButtons")
         self.resolution_3 = QtWidgets.QRadioButton(self.ResolutionButtons)
         self.resolution_3.setGeometry(QtCore.QRect(520, 0, 16, 17))
-        self.resolution_3.setStyleSheet("QRadioButton::indicator {\n"
-                                        "    width:10px;\n"
-                                        "    height:10px;\n"
-                                        "    border-radius: 8px;\n"
-                                        "    border: 3px solid #57AECB;\n"
-                                        "}\n"
-                                        "\n"
-                                        "QRadioButton::indicator:unchecked  {\n"
-                                        "    background: transparent;\n"
-                                        "}\n"
-                                        "\n"
-                                        "QRadioButton::indicator:checked  {\n"
-                                        "    background: #87CEEB;\n"
-                                        "}")
         self.resolution_3.setText("")
         self.resolution_3.setChecked(False)
         self.resolution_3.setObjectName("resolution_3")
         self.resolution_0 = QtWidgets.QRadioButton(self.ResolutionButtons)
         self.resolution_0.setGeometry(QtCore.QRect(0, 0, 16, 17))
-        self.resolution_0.setStyleSheet("QRadioButton::indicator {\n"
-                                        "    width:10px;\n"
-                                        "    height:10px;\n"
-                                        "    border-radius: 8px;\n"
-                                        "    border: 3px solid #57AECB;\n"
-                                        "}\n"
-                                        "\n"
-                                        "QRadioButton::indicator:unchecked  {\n"
-                                        "    background: transparent;\n"
-                                        "}\n"
-                                        "\n"
-                                        "QRadioButton::indicator:checked  {\n"
-                                        "    background: #87CEEB;\n"
-                                        "}")
         self.resolution_0.setText("")
         self.resolution_0.setChecked(True)
         self.resolution_0.setObjectName("resolution_0")
         self.resolution_1 = QtWidgets.QRadioButton(self.ResolutionButtons)
         self.resolution_1.setGeometry(QtCore.QRect(190, 0, 16, 17))
-        self.resolution_1.setStyleSheet("QRadioButton::indicator {\n"
-                                        "    width:10px;\n"
-                                        "    height:10px;\n"
-                                        "    border-radius: 8px;\n"
-                                        "    border: 3px solid #57AECB;\n"
-                                        "}\n"
-                                        "\n"
-                                        "QRadioButton::indicator:unchecked  {\n"
-                                        "    background: transparent;\n"
-                                        "}\n"
-                                        "\n"
-                                        "QRadioButton::indicator:checked  {\n"
-                                        "    background: #87CEEB;\n"
-                                        "}")
         self.resolution_1.setText("")
         self.resolution_1.setChecked(False)
         self.resolution_1.setObjectName("resolution_1")
         self.resolution_2 = QtWidgets.QRadioButton(self.ResolutionButtons)
         self.resolution_2.setGeometry(QtCore.QRect(360, 0, 16, 17))
-        self.resolution_2.setStyleSheet("QRadioButton::indicator {\n"
-                                        "    width:10px;\n"
-                                        "    height:10px;\n"
-                                        "    border-radius: 8px;\n"
-                                        "    border: 3px solid #57AECB;\n"
-                                        "}\n"
-                                        "\n"
-                                        "QRadioButton::indicator:unchecked  {\n"
-                                        "    background: transparent;\n"
-                                        "}\n"
-                                        "\n"
-                                        "QRadioButton::indicator:checked  {\n"
-                                        "    background: #87CEEB;\n"
-                                        "}")
         self.resolution_2.setText("")
         self.resolution_2.setChecked(False)
         self.resolution_2.setObjectName("resolution_2")
@@ -618,6 +413,40 @@ class Ui_Settings(object):
 
         self.retranslateUi(Settings)
         QtCore.QMetaObject.connectSlotsByName(Settings)
+
+        self.sharpnessButtonGroup = QtWidgets.QButtonGroup()
+        self.sharpnessButtonGroup.addButton(self.sharpness_0, 0)
+        self.sharpnessButtonGroup.addButton(self.sharpness_1, 1)
+        self.sharpnessButtonGroup.addButton(self.sharpness_2, 2)
+        self.sharpnessButtonGroup.addButton(self.sharpness_3, 3)
+        self.sharpnessButtonGroup.buttonClicked.connect(
+            self.onSharpnessChanged)
+
+        self.centeringButtonGroup = QtWidgets.QButtonGroup()
+        self.centeringButtonGroup.addButton(self.centering_0, 0)
+        self.centeringButtonGroup.addButton(self.centering_1, 1)
+        self.centeringButtonGroup.addButton(self.centering_2, 2)
+        self.centeringButtonGroup.addButton(self.centering_3, 3)
+        self.centeringButtonGroup.buttonClicked.connect(
+            self.onCenteringChanged)
+
+        self.lightingButtonGroup = QtWidgets.QButtonGroup()
+        self.lightingButtonGroup.addButton(self.lighting_0, 0)
+        self.lightingButtonGroup.addButton(self.lighting_1, 1)
+        self.lightingButtonGroup.addButton(self.lighting_2, 2)
+        self.lightingButtonGroup.addButton(self.lighting_3, 3)
+        self.lightingButtonGroup.buttonClicked.connect(
+            self.onLightingChanged)
+
+        self.resolutionButtonGroup = QtWidgets.QButtonGroup()
+        self.resolutionButtonGroup.addButton(self.resolution_0, 0)
+        self.resolutionButtonGroup.addButton(self.resolution_1, 1)
+        self.resolutionButtonGroup.addButton(self.resolution_2, 2)
+        self.resolutionButtonGroup.addButton(self.resolution_3, 3)
+        self.resolutionButtonGroup.buttonClicked.connect(
+            self.onResolutionChanged)
+
+        self.horizontalSlider.valueChanged.connect(self.onThresholdChanged)
 
     def retranslateUi(self, Settings):
         _translate = QtCore.QCoreApplication.translate
@@ -633,6 +462,40 @@ class Ui_Settings(object):
         self.Centering.setText(_translate("Settings", "Centering"))
         self.Lighting.setText(_translate("Settings", "Lighting"))
         self.Resolution.setText(_translate("Settings", "Resolution"))
+
+    def setSettings(self, settings):
+        self.sharpnessButtonGroup.button(
+            settings["sharpness"]).setChecked(True)
+        self.centeringButtonGroup.button(
+            settings["centering"]).setChecked(True)
+        self.lightingButtonGroup.button(
+            settings["lighting"]).setChecked(True)
+        self.resolutionButtonGroup.button(
+            settings["resolution"]).setChecked(True)
+        self.horizontalSlider.setValue(int(settings["threshold"] * 100))
+
+    def onSharpnessChanged(self, button):
+        if button.isChecked():
+            self.criteriaChangedSignal.emit(
+                "sharpness", self.sharpnessButtonGroup.checkedId())
+
+    def onCenteringChanged(self, button):
+        if button.isChecked():
+            self.criteriaChangedSignal.emit(
+                "centering", self.centeringButtonGroup.checkedId())
+
+    def onLightingChanged(self, button):
+        if button.isChecked():
+            self.criteriaChangedSignal.emit(
+                "lighting", self.lightingButtonGroup.checkedId())
+
+    def onResolutionChanged(self, button):
+        if button.isChecked():
+            self.criteriaChangedSignal.emit(
+                "resolution", self.resolutionButtonGroup.checkedId())
+
+    def onThresholdChanged(self, value):
+        self.thresholdChangedSignal.emit(value / 100)
 
 
 if __name__ == "__main__":
