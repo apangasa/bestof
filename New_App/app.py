@@ -11,6 +11,7 @@ from analyzing_page import Ui_AnalyzingPage
 from main import Ui_MainWindow
 from menu import Ui_MainMenu
 from settings import Ui_Settings
+from results import Ui_Results
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5 import QtCore
 from threading import Thread
@@ -121,12 +122,16 @@ class BestOfApp(QObject):
         self.AnalyzingPage = QWidget()
         self.Ui_AnalyzingPage = Ui_AnalyzingPage()
         self.Ui_AnalyzingPage.setupUi(self.AnalyzingPage)
+        self.Results = QWidget()
+        self.Ui_Results = Ui_Results()
+        self.Ui_Results.setupUi(self.Results)
 
         self.MainWindow.installEventFilter(self)
 
         self.Ui_MainWindow.stackedWidget.addWidget(self.MainMenu)
         self.Ui_MainWindow.stackedWidget.addWidget(self.Settings)
         self.Ui_MainWindow.stackedWidget.addWidget(self.AnalyzingPage)
+        self.Ui_MainWindow.stackedWidget.addWidget(self.Results)
 
         self.Ui_MainWindow.progressBar.setVisible(False)
 
@@ -140,6 +145,8 @@ class BestOfApp(QObject):
         self.Ui_MainMenu.Settings.clicked.connect(
             lambda: self.Ui_MainWindow.stackedWidget.setCurrentIndex(1))
         self.Ui_Settings.Back.clicked.connect(
+            lambda: self.Ui_MainWindow.stackedWidget.setCurrentIndex(0))
+        self.Ui_Results.Back.clicked.connect(
             lambda: self.Ui_MainWindow.stackedWidget.setCurrentIndex(0))
 
         self.analyzingCriteriaChangedSignal.connect(
@@ -195,8 +202,8 @@ class BestOfApp(QObject):
             progress += 1
             self.progressChangedSignal.emit(int(progress / maxProgress * 100))
 
-        threshold = 0.8  # this should be grabbed from whatever the user set it to in the settings
-        groups = similarity.group(vectors, threshold=threshold)
+        groups = similarity.group(
+            vectors, threshold=self.settings["threshold"])
         self.groups = groups
 
         image_generator = loadImages(list(file[0]))
@@ -283,10 +290,11 @@ class BestOfApp(QObject):
     def onAnalyzingFinished(self):
         self.Ui_MainWindow.changeStatus(
             "Analyzing finished successfully", "green")
-        # self.Ui_MainWindow.stackedWidget.setCurrentIndex(3) - switch to results view
-        # self.Ui_ResultsView.display(self.imageList, self.groups) - display results
-        self.Ui_MainWindow.stackedWidget.setCurrentIndex(
-            0)  # for now, just back to the main menu
+        self.Ui_MainWindow.stackedWidget.setCurrentIndex(3)
+        self.Ui_Results.display(self.imageList, self.groups)
+
+    def onImageToggled(self, selected, id):
+        pass
 
 
 if __name__ == "__main__":
