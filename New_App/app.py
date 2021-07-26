@@ -5,8 +5,9 @@ import numpy as np
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QFileDialog
 from torch._C import layout
-import res
 import json
+import collections
+import res
 from analyzing_page import Ui_AnalyzingPage
 from main import Ui_MainWindow
 from menu import Ui_MainMenu
@@ -16,12 +17,16 @@ from PyQt5 import QtCore
 from threading import Thread
 import time
 
+sys.path.insert(1, 'bestOf/backend')
+
+
 import bestOf.backend.similarity as similarity
 import bestOf.backend.blinkDetector as blinkDetector
 import bestOf.backend.cropDetector as cropDetector
 import bestOf.backend.evaluateSharpness as evaluateSharpness
 import bestOf.backend.identifyPeople as identifyPeople
 import bestOf.backend.evaluateCentering as evaluateCentering
+import bestOf.backend.createScoreMaps as createScoreMaps
 import bestOf.backend.sitePackagePathConstructor as sitePackagePathConstructor
 
 
@@ -47,35 +52,33 @@ def loadImages(filenames):
         yield (image * 255).astype(np.uint8)[:, :, :3] if 'png' in filename else image
 
 
-def simulateAnalyzing(imagelist, groups, settings, callback):
+def simulateAnalyzing(filenames, imagelist, groups, settings, callback):
     imagelistLen = len(imagelist)
 
     maxProgress = 0
-    maxProgress += min(1, settings["sharpness"]) * imagelistLen
+    # sharpness iterates over images 3 times
+    maxProgress += min(1, settings["sharpness"]) * imagelistLen * 3
     maxProgress += min(1, settings["centering"]) * imagelistLen
     maxProgress += min(1, settings["lighting"]) * imagelistLen
     maxProgress += min(1, settings["resolution"]) * imagelistLen
     progress = 0
 
+    sharpness_map = {}
+    centering_map = {}
+    lighting_map = {}
+    resolution_map = {}
+
     if settings["sharpness"]:
-        for group in groups:
-            for index in group:
-                for item in imagelist:
-                    if item[0] == index:
-                        time.sleep(0.1)  # Analyze sharpness
-                        progress += 1
-                        callback("sharpness", item[1], int(
-                            progress / maxProgress * 100))
+        image_generator = loadImages(filenames)
+
+        sharpness_map, progress = createScoreMaps.create_sharpness_map(
+            image_generator, imagelist, groups, callback, progress, maxProgress)
+        print(sharpness_map)
 
     if settings["centering"]:
-        for group in groups:
-            for index in group:
-                for item in imagelist:
-                    if item[0] == index:
-                        time.sleep(0.1)  # Analyze centering
-                        progress += 1
-                        callback("centering", item[1], int(
-                            progress / maxProgress * 100))
+        centering_map, progress = createScoreMaps.create_centering_map(
+            imagelist, groups, callback, progress, maxProgress)
+        print(centering_map)
 
     if settings["lighting"]:
         for group in groups:
@@ -153,6 +156,7 @@ class BestOfApp(QObject):
         self.settings = read_settings()
         self.Ui_Settings.setSettings(self.settings)
 
+        self.filenames = []
         self.imageList = []
         self.groups = []
 
@@ -173,14 +177,14 @@ class BestOfApp(QObject):
         file = QFileDialog.getOpenFileNames(
             self.MainWindow, 'Add Files', QtCore.QDir.currentPath(), "Image Files (*.png *.jpg)")
         if len(file[0]) == 0:
-            self.Ui_MainWindow.changeStatus("No files selected", "red")
+            self.Ui_MainWindow.changeStatus("No files selected!", "red")
             return
         self.Ui_MainWindow.changeStatus("Reading images...")
         thread = Thread(target=self.loadFiles, args=(file,))
         thread.start()
 
     def loadFiles(self, file):
-        maxProgress = len(file[0]) * 2
+        maxProgress = len(file[0])
         progress = 0
 
         loaded = []
@@ -188,12 +192,19 @@ class BestOfApp(QObject):
             loaded = [item[1] for item in self.imageList]
 
         image_generator = loadImages(list(file[0]) + loaded)
+        self.filenames = list(file[0])
+
         vectors = []
         for image in image_generator:
             v = similarity.generate_feature_vector(image)
             vectors.append(v)
             progress += 1
             self.progressChangedSignal.emit(int(progress / maxProgress * 100))
+
+        self.Ui_MainWindow.changeStatus("Running default analysis...")
+        progress = 0
+        maxProgress = len(file[0])
+        self.progressChangedSignal.emit(int(progress / maxProgress * 100))
 
         threshold = 0.8  # this should be grabbed from whatever the user set it to in the settings
         groups = similarity.group(vectors, threshold=threshold)
@@ -207,7 +218,8 @@ class BestOfApp(QObject):
 
         for image in image_generator:
             # print('Scanning Image...')
-            subjects, bounds_list = identifyPeople.crop_subjects(image)
+            subjects, bounds_list = identifyPeople.crop_subjects_from_segmented_image(
+                image, n=4)
             # print("len of subjects", len(subjects))
             blinks = 0
             crops = 0
@@ -263,7 +275,7 @@ class BestOfApp(QObject):
     def analyzeImages(self):
         if len(self.imageList) == 0:
             self.Ui_MainWindow.changeStatus(
-                "Images not loaded, upload images first", "red")
+                "Nothing to process! Upload images by clicking the Add Files button.", "red")
             return
         self.Ui_MainWindow.changeStatus("Analyzing...")
         self.Ui_MainWindow.stackedWidget.setCurrentIndex(2)
@@ -271,7 +283,7 @@ class BestOfApp(QObject):
         thread.start()
 
     def analyzingThread(self):
-        self.groups = simulateAnalyzing(self.imageList, self.groups,
+        self.groups = simulateAnalyzing(self.filenames, self.imageList, self.groups,
                                         self.settings, self.analyzingCallback)
         self.analyzingFinishedSignal.emit()
 
