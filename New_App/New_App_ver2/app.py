@@ -66,7 +66,7 @@ class BestOfApp(QObject):
         if len(file[0]) == 0:
             self.Ui_MainWindow.changeStatus("No files selected", "red")
             return
-        self.Ui_MainWindow.changeStatus("Reading images...")
+        self.Ui_MainWindow.changeStatus("Loading...")
         thread = Thread(target=self.loadFiles, args=(file,))
         thread.start()
 
@@ -144,7 +144,7 @@ class BestOfApp(QObject):
         final = sorted(final, key=lambda x: x[2], reverse=True)
         print(final)
         self.imageList = final
-        self.statusChangedSignal.emit("Successfully loaded images! Check Settings, then click Run Analysis to process your images.", "green")
+        self.statusChangedSignal.emit("Successfully loaded", "green")
 
 
 if __name__ == "__main__":
@@ -152,3 +152,4 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     bestOfApp = BestOfApp()
     sys.exit(app.exec_())
+
