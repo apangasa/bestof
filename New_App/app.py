@@ -25,6 +25,7 @@ import bestOf.backend.similarity as similarity
 import bestOf.backend.blinkDetector as blinkDetector
 import bestOf.backend.cropDetector as cropDetector
 import bestOf.backend.evaluateSharpness as evaluateSharpness
+import bestOf.backend.evaluateLighting as evaluateLighting
 import bestOf.backend.identifyPeople as identifyPeople
 import bestOf.backend.evaluateCentering as evaluateCentering
 import bestOf.backend.createScoreMaps as createScoreMaps
@@ -75,21 +76,15 @@ def simulateAnalyzing(filenames, imagelist, groups, settings, callback):
             image_generator, imagelist, groups, callback, progress, maxProgress)
         print(sharpness_map)
 
-
     if settings["centering"]:
         centering_map, progress = createScoreMaps.create_centering_map(
             imagelist, groups, callback, progress, maxProgress)
         print(centering_map)
 
     if settings["lighting"]:
-        for group in groups:
-            for index in group:
-                for item in imagelist:
-                    if item[0] == index:
-                        time.sleep(0.1)  # Analyze lighting
-                        progress += 1
-                        callback("lighting", item[1], int(
-                            progress / maxProgress * 100))
+        lighting_map, progress = createScoreMaps.create_lighting_map(
+            imagelist, groups, callback, progress, maxProgress)
+        print(lighting_map)
 
     if settings["resolution"]:
         for group in groups:
@@ -220,10 +215,13 @@ class BestOfApp(QObject):
             vectors, threshold=self.settings["threshold"])
         self.groups = groups
 
+        print(self.groups)
+
         image_generator = loadImages(list(file[0]))
 
         default_scores = []
         subject_sharpness_scores = []
+        subject_lighting_scores = []
         centering_scores = []
 
         for image in image_generator:
@@ -235,6 +233,7 @@ class BestOfApp(QObject):
             crops = 0
 
             subject_sharpness_scores.append([])
+            subject_lighting_scores.append([])
 
             centering_scores.append(
                 evaluateCentering.evaluate_centering(bounds_list, image))
@@ -249,6 +248,9 @@ class BestOfApp(QObject):
 
                 subject_sharpness_scores[-1].append(
                     evaluateSharpness.evaluate_sharpness(sub))
+
+                subject_lighting_scores[-1].append(
+                    evaluateLighting.evaluate_lighting(sub))
 
             if len(subjects) == 0:
                 default_scores.append(0)
@@ -272,7 +274,7 @@ class BestOfApp(QObject):
             max_index = -1
 
         final = zip(
-            range(max_index + 1, max_index + 1 + len(file[0])), file[0], default_scores, subject_sharpness_scores, centering_scores)
+            range(max_index + 1, max_index + 1 + len(file[0])), file[0], default_scores, subject_sharpness_scores, centering_scores, subject_lighting_scores)
 
         if len(self.imageList):
             final = list(final) + self.imageList
