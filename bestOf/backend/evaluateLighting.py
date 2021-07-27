@@ -61,6 +61,10 @@ def collect_regions(landmarks):
                 pass
 
 
+def evaluate_lighting(image):
+    return pure_luminance_analysis(image)[0]
+
+
 if __name__ == '__main__':
     subs, _ = identifyPeople.crop_subjects(identifyPeople.read_img(
         './bestOf/resources/examples/dark.jpg'))
