@@ -1,5 +1,7 @@
 import bestOf.backend.evaluateSharpness as evaluateSharpness
 import bestOf.backend.evaluateCentering as evaluateCentering
+import bestOf.backend.evaluateLighting as evaluateLighting
+import bestOf.backend.evaluateResolution as evaluateResolution
 
 
 def create_sharpness_map(images, image_info, groups, progress_func, progress, max_progress):
@@ -72,3 +74,29 @@ def create_centering_map(image_info, groups, progress_func, progress, max_progre
             centering_map[index] = group_centering_scores[idx_in_group]
 
     return centering_map, progress
+
+
+def create_lighting_map(image_info, groups, progress_func, progress, max_progress):
+    lighting_map = {}
+    for group in groups:
+        avg_subject_lighting_scores = []
+        for index in group:
+            for pos, item in enumerate(image_info):
+                if item[0] == index:
+                    subject_lighting_scores = item[5]
+                    if not len(subject_lighting_scores):
+                        avg_subject_lighting_scores.append(0)
+                        continue
+
+                    avg_subject_lighting_scores.append(
+                        sum(subject_lighting_scores) / len(subject_lighting_scores))
+            progress += 1
+            progress_func("lighting", image_info[pos][1], int(
+                progress / max_progress * 100))
+        avg_subject_lighting_scores = evaluateLighting.normalize_lighting_scores(
+            avg_subject_lighting_scores)
+
+        for idx_in_group, index in enumerate(group):
+            lighting_map[index] = avg_subject_lighting_scores[idx_in_group]
+
+    return lighting_map, progress
