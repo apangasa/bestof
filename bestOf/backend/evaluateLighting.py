@@ -2,8 +2,8 @@ import mediapipe as mp
 import math
 import cv2 as cv
 import numpy as np
-import identifyPeople
-import evaluateCentering
+import bestOf.backend.identifyPeople as identifyPeople
+import bestOf.backend.evaluateCentering as evaluateCentering
 
 FACE_MESH_CREATOR = mp.solutions.face_mesh.FaceMesh(
     static_image_mode=True, max_num_faces=1, min_detection_confidence=0.5)
@@ -36,6 +36,17 @@ def pure_luminance_analysis(image):
             l_vals.append(luminance)
     mean = sum(l_vals) / len(l_vals)
     return mean, l_vals
+
+
+def normalize_lighting_scores(group_scores):
+    max_val = max(group_scores)
+
+    if not max_val:
+        return [1.0] * len(group_scores)
+
+    normalized_scores = [float(score) / float(max_val)
+                         for score in group_scores]
+    return normalized_scores
 
 
 def evaluate_lighting_in_region(pixels):
