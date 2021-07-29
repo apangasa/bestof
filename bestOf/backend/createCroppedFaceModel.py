@@ -9,7 +9,7 @@ import torch.optim as optim
 import torch.nn as nn
 import torch.nn.functional as fn
 from torch.utils.data import DataLoader, Dataset, random_split
-from bestOf.createCroppedFaceDataset import custom_dataset
+from backend.createCroppedFaceDataset import custom_dataset
 
 
 class BlinkAndCropNet(torch.nn.Module):
@@ -51,14 +51,14 @@ def load_dataset(img_height, img_width):
 
     # Loads all images from lfw and lfw_cut with opencv and stores it in all_x,
     # stores all labels in all_y
-    lfw_path = "../resources/lfw"
-    lfw_cropped_path = "../resources/lfw_cut"
+    Uncropped_path = "bestOf/resources/identifiedFaces"
+    Cropped_path = "bestOf/resources/identifiedFacesCropped"
 
     all_x = []
     all_y = []
     # Load all images from lfw with label in all_x and all_y
-    for folder in os.listdir(lfw_path):
-        folder_path = os.path.join(lfw_path, folder)
+    for folder in os.listdir(Uncropped_path):
+        folder_path = os.path.join(Uncropped_path, folder)
 
         for img in os.listdir(folder_path):
             image = cv.imread(os.path.join(folder_path, img))
@@ -72,8 +72,8 @@ def load_dataset(img_height, img_width):
             all_x.append(image)
             all_y.append(0.0)
 
-    for folder in os.listdir(lfw_cropped_path):
-        folder_path = os.path.join(lfw_cropped_path, folder)
+    for folder in os.listdir(Cropped_path):
+        folder_path = os.path.join(Cropped_path, folder)
 
         for img in os.listdir(folder_path):
             image = cv.imread(os.path.join(folder_path, img))
@@ -96,10 +96,10 @@ def load_dataset(img_height, img_width):
 
 def train(all_x, all_y, split, device):
     # Define basic variables and parameters
-    learning_rate = 0.0001
+    learning_rate = 0.00005
     batch_size = 64
-    epoch = 8
-    model_path = "./saved_models/cropped_faces.pth"
+    epoch = 10
+    model_path = "./bestOf/backend/saved_models/cropped_faces.pth"
 
     # Create all of the dataloaders and models, then train it with train_loader
     transform = transforms.Compose(
