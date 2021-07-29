@@ -5,14 +5,14 @@ import numpy as np
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QFileDialog
 from torch._C import layout
-import res
+import bestOf.frontend.res
 import json
 import collections
-from analyzing_page import Ui_AnalyzingPage
-from main import Ui_MainWindow
-from menu import Ui_MainMenu
-from settings import Ui_Settings
-from results import Ui_Results
+from bestOf.frontend.analyzing_page import Ui_AnalyzingPage
+from bestOf.frontend.main import Ui_MainWindow
+from bestOf.frontend.menu import Ui_MainMenu
+from bestOf.frontend.settings import Ui_Settings
+from bestOf.frontend.results import Ui_Results
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5 import QtCore
 from threading import Thread
@@ -87,16 +87,24 @@ def simulateAnalyzing(filenames, imagelist, groups, settings, callback):
         print(lighting_map)
 
     if settings["resolution"]:
-        for group in groups:
-            for index in group:
-                for item in imagelist:
-                    if item[0] == index:
-                        time.sleep(0.1)  # Analyze resolution
-                        progress += 1
-                        callback("resolution", item[1], int(
-                            progress / maxProgress * 100))
+        image_generator = loadImages(filenames)
 
-    return groups  # should return sorted groups
+        resolution_map, progress = createScoreMaps.create_resolution_map(
+            image_generator, imagelist, groups, callback, progress, maxProgress)
+        print(resolution_map)
+
+    total_score_map = createScoreMaps.create_total_score_map(
+        imagelist, sharpness_map, centering_map, lighting_map, resolution_map)
+
+    sorted_groups = []
+    for group in groups:
+        sorted_group = []
+        for index in group:
+            sorted_group.append((index, total_score_map[index]))
+        sorted_group = sorted(sorted_group, key=lambda x: x[1], reverse=True)
+        sorted_groups.append([element[0] for element in sorted_group])
+
+    return sorted_groups
 
 
 class BestOfApp(QObject):
@@ -337,8 +345,12 @@ class BestOfApp(QObject):
         self.statusChangedSignal.emit("Downloading Finished", "green")
 
 
-if __name__ == "__main__":
+def main():
     import sys
     app = QApplication(sys.argv)
     bestOfApp = BestOfApp()
     sys.exit(app.exec_())
+
+
+if __name__ == "__main__":
+    main()
