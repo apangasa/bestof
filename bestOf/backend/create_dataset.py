@@ -4,6 +4,7 @@ from identifyPeople import crop_subjects_from_segmented_image as identify
 from matplotlib import pyplot as plt
 import os
 import shutil
+from random import randint
 
 
 def make_set():
@@ -46,7 +47,7 @@ def make_set():
 
 
 
-crop_all_images():
+def crop_all_images():
     counter = 0
     counter_cropped = 0
     print('Starting to crop all images...')
@@ -64,13 +65,16 @@ crop_all_images():
         for i, img in enumerate(os.listdir(os.path.join(directory, folder))):
             counter += 1
             strings = img.split('.')
-            name = strings[0] + str(i)
+            name = strings[0] + str(i) + '.' + strings[1]
 
-            cropped_list = crop_an_image(img, 0.15, 0.2)
+            image = cv.imread(os.path.join(directory, folder, img))
+            rand_x = randint(20, 25)
+            rand_y = randint(20, 25)
+            cropped_list = crop_an_image(image, rand_x / 100, rand_y / 100)
 
-            for pic in cropped_list:
-                cv.imwrite(os.path.join(new_set, folder + '_Cropped', name), pic)
-                counter_cropped += 1
+            index = randint(0, 3)
+            cv.imwrite(os.path.join(new_set, folder + '_Cropped', name), cropped_list[index])
+            counter_cropped += 1
         
         print("----Finished----\n")
 
@@ -80,11 +84,13 @@ crop_all_images():
 def crop_an_image(image, x, y):
     height = int(image.shape[0] * y)
     length = int(image.shape[1] * x)
+    b_height = (image.shape[0] - height)
+    b_length = (image.shape[1] - length)
 
     left_cutoff = image[:, length:]
     top_cutoff = image[height:, :]
-    right_cutoff = image[:, :length]
-    bottom_cutoff = image[:height, :]
+    right_cutoff = image[:, :b_length]
+    bottom_cutoff = image[:b_height, :]
 
     return [left_cutoff, top_cutoff, right_cutoff, bottom_cutoff]
 
