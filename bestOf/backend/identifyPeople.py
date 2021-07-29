@@ -42,7 +42,7 @@ def crop_subjects_from_segmented_image(image, n=8):
     delta_h = int(im_height / n)
     delta_w = int(im_width / n)
 
-    print(delta_h, delta_w)
+    #print(delta_h, delta_w)
 
     all_subjects = []
     all_bounds = []
@@ -70,7 +70,7 @@ def crop_subjects_from_segmented_image(image, n=8):
     intermediate_range = [
         element + 0.5 for element in range(n) if element != n - 1]
 
-    print(intermediate_range)
+    #print(intermediate_range)
 
     for i in intermediate_range:
         for j in range(n):
