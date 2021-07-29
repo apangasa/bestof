@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="bestOf",
-    version="0.0.65",
+    version="0.0.77",
     description="A module that uses machine learning to chose the best image in groups",
     packages=["bestOf", "bestOf.backend",
               "bestOf.backend.saved_models", "bestOf.frontend", ],
@@ -13,11 +13,11 @@ setup(
                       "PyQt5",
                       "Pillow",
                       "matplotlib",
-                      "opencv-python"],
+                      "opencv-python-headless"],
     include_package_data=True,
 
     entry_points={
-        'console_scripts': ['bestOf = bestOf.frontend.frontend:main'],
+        'console_scripts': ['bestOf = bestOf.frontend.app:main'],
     }
 
 )
