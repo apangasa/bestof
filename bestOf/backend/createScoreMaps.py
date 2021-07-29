@@ -3,6 +3,8 @@ import bestOf.backend.evaluateCentering as evaluateCentering
 import bestOf.backend.evaluateLighting as evaluateLighting
 import bestOf.backend.evaluateResolution as evaluateResolution
 
+import collections
+
 
 def create_sharpness_map(images, image_info, groups, progress_func, progress, max_progress):
     sharpness_scores = []
@@ -100,3 +102,45 @@ def create_lighting_map(image_info, groups, progress_func, progress, max_progres
             lighting_map[index] = avg_subject_lighting_scores[idx_in_group]
 
     return lighting_map, progress
+
+
+def create_resolution_map(images, image_info, groups, progress_func, progress, max_progress):
+    resolution_scores = []
+    resolution_map = {}
+
+    for idx, image in enumerate(images):
+        resolution_scores.append(evaluateResolution.evaluate_resolution(
+            image))
+        progress += 1
+        progress_func("resolution", image_info[idx][1], int(
+            progress / max_progress * 100))
+
+    for group in groups:
+        group_resolution_scores = []
+        for index in group:
+            for pos, item in enumerate(image_info):
+                if item[0] == index:
+                    group_resolution_scores.append(
+                        resolution_scores[pos])
+                    break
+            progress += 1
+            progress_func("resolution", image_info[pos][1], int(
+                progress / max_progress * 100))
+        group_resolution_scores = evaluateResolution.normalize_resolution_scores(
+            group_resolution_scores)
+
+        for idx_in_group, index in enumerate(group):
+            resolution_map[index] = group_resolution_scores[idx_in_group]
+    return resolution_map, progress
+
+
+def create_total_score_map(image_info, sharpness_map, centering_map, lighting_map, resolution_map):
+    overall_score_map = collections.Counter(sharpness_map) + collections.Counter(
+        centering_map) + collections.Counter(lighting_map) + collections.Counter(resolution_map)
+
+    overall_score_map = dict(overall_score_map)
+
+    for item in image_info:
+        overall_score_map[item[0]] += item[2]
+
+    return overall_score_map
