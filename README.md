@@ -2,13 +2,55 @@
 
 ## Installation and Running
 
-The pip installation command is:
+### For Windows
 
-```py
-pip install bestOf==0.0.84
+Simply run the following the commands:
+
+```
+pip install bestOf==0.0.86
+bestOf
 ```
 
-To run bestOf, simply type: "bestOf" (without the quotes) and watch the magic.
+### For WSL
+
+Install the package by running the folllowing in WSL:
+
+```
+pip install bestOf==0.0.86
+```
+
+Install Qt and related packages by running the following in WSL:
+
+```
+sudo apt install qt5-default
+sudo apt-get install --reinstall libxcb-xinerama0
+
+```
+
+Install VcXsrv. One way to do so is by running the following commands in Powershell:
+
+```
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+choco install vcxsrv
+```
+
+Start XLaunch with the following settings:
+
+- Multiple windows
+- Display number: -1
+- Start no client
+- Clipboard
+- Primary Selection
+- Native opengl
+- Disable access control
+
+To run the application, run the following in WSL:
+
+```
+export DISPLAY=:0
+bestOf
+```
 
 ## Summary
 
