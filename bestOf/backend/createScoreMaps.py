@@ -49,8 +49,8 @@ def create_sharpness_map(images, image_info, groups, weight, progress_func, prog
             avg_subject_sharpness_scores)
 
         for idx_in_group, index in enumerate(group):
-            sharpness_map[index] = weight * (group_sharpness_scores[idx_in_group] + (
-                avg_subject_sharpness_scores[idx_in_group] / 2))
+            sharpness_map[index] = weight * ((3 / 4) * group_sharpness_scores[idx_in_group] + (
+                avg_subject_sharpness_scores[idx_in_group] / 4))
 
     return sharpness_map, progress
 
