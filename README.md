@@ -5,7 +5,7 @@
 The pip installation command is:
 
 ```py
-pip install bestOf==0.0.80
+pip install bestOf==0.0.84
 ```
 
 To run bestOf, simply type: "bestOf" (without the quotes) and watch the magic.
