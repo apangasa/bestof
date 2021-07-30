@@ -96,6 +96,10 @@ def simulateAnalyzing(filenames, imagelist, groups, settings, callback):
     total_score_map = createScoreMaps.create_total_score_map(
         imagelist, sharpness_map, centering_map, lighting_map, resolution_map)
 
+    print('\n\n')
+    print('Total Score Map', total_score_map)
+    print('\n\n')
+
     sorted_groups = []
     for group in groups:
         sorted_group = []
@@ -188,6 +192,11 @@ class BestOfApp(QObject):
         return super().eventFilter(obj, event)
 
     def getFiles(self):
+        self.filenames = []
+        self.imageList = []
+        self.groups = []
+        self.downloadingList = []
+
         file = QFileDialog.getOpenFileNames(
             self.MainWindow, 'Add Files', QtCore.QDir.currentPath(), "Image Files (*.png *.jpg)")
         if len(file[0]) == 0:
@@ -236,6 +245,7 @@ class BestOfApp(QObject):
             # print('Scanning Image...')
             subjects, bounds_list = identifyPeople.crop_subjects_from_segmented_image(
                 image, n=4)
+
             # print("len of subjects", len(subjects))
             blinks = 0
             crops = 0
@@ -247,7 +257,6 @@ class BestOfApp(QObject):
                 evaluateCentering.evaluate_centering(bounds_list, image))
 
             for sub in subjects:
-                # identifyPeople.show_img(sub)
                 # print('Scanning Subject...')
                 if blinkDetector.test(sub):
                     blinks += 1
@@ -286,9 +295,9 @@ class BestOfApp(QObject):
 
         if len(self.imageList):
             final = list(final) + self.imageList
-        final = sorted(final, key=lambda x: x[2], reverse=True)
+        # final = sorted(final, key=lambda x: x[2], reverse=True)
         print(final)
-        self.imageList = final
+        self.imageList = list(final)
         self.statusChangedSignal.emit(
             "Successfully loaded images! Check Settings, then click Run Analysis to process your images.", "green")
 
