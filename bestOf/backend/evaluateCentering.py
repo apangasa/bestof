@@ -1,8 +1,8 @@
 import math
 
 
-def euclidean(coord1, coord2):
-    return math.sqrt(((coord1[0] - coord2[0]) ** 2) + ((coord1[1] - coord2[1]) ** 2))
+def euclidean(coord1, coord2, y_modifier=3):
+    return math.sqrt(((coord1[0] - coord2[0]) ** 2) + (((coord1[1] - coord2[1]) / y_modifier) ** 2))
 
 
 def evaluate_centering(bounds_list, image):
