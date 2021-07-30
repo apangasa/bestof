@@ -2,7 +2,7 @@ import cv2 as cv
 import mediapipe as mp
 from matplotlib import pyplot as plt
 import numpy as np
-
+import bestOf.backend.similarity as similarity
 
 FACE_DETECTOR = mp.solutions.face_detection.FaceDetection(
     model_selection=1, min_detection_confidence=0.7)
@@ -70,7 +70,7 @@ def crop_subjects_from_segmented_image(image, n=8):
     intermediate_range = [
         element + 0.5 for element in range(n) if element != n - 1]
 
-    #print(intermediate_range)
+    # print(intermediate_range)
 
     for i in intermediate_range:
         for j in range(n):
@@ -80,7 +80,10 @@ def crop_subjects_from_segmented_image(image, n=8):
 
             for idx, sub in enumerate(subs):
                 for existing_sub in all_subjects:
-                    if array_is_subset(existing_sub, sub[0:int(sub.shape[0] / 4), 0:int(sub.shape[1] / 4)]):
+                    u = similarity.generate_feature_vector(sub)
+                    v = similarity.generate_feature_vector(existing_sub)
+
+                    if array_is_subset(existing_sub, sub[0:int(sub.shape[0] / 4), 0:int(sub.shape[1] / 4)]) or similarity.equiv(u, v, 0.8):
                         break
                 else:
                     all_subjects.append(sub)
@@ -94,7 +97,10 @@ def crop_subjects_from_segmented_image(image, n=8):
 
             for idx, sub in enumerate(subs):
                 for existing_sub in all_subjects:
-                    if array_is_subset(existing_sub, sub[0:int(sub.shape[0] / 4), 0:int(sub.shape[1] / 4)]):
+                    u = similarity.generate_feature_vector(sub)
+                    v = similarity.generate_feature_vector(existing_sub)
+
+                    if array_is_subset(existing_sub, sub[0:int(sub.shape[0] / 4), 0:int(sub.shape[1] / 4)]) or similarity.equiv(u, v, 0.8):
                         break
                 else:
                     all_subjects.append(sub)
@@ -190,7 +196,7 @@ def crop_subjects(image):
             bounds.width * im_width), int(bounds.height * im_height)
         sub = image[y:y + h, x:x + w]
 
-        if not len(sub):
+        if not len(sub) or w < 40 or h < 40:
             continue
 
         try:
