@@ -36,6 +36,11 @@ def generate_feature_vector(image):
     return embedding
 
 
+def equiv(u, v, threshold):
+    cos = nn.CosineSimilarity(dim=1, eps=1e-6)
+    return cos(u.unsqueeze(0), v.unsqueeze(0)) >= threshold
+
+
 def group(vectors, threshold=0.9):
     cos = nn.CosineSimilarity(dim=1, eps=1e-6)
     scores = []
