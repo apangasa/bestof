@@ -6,7 +6,7 @@ import bestOf.backend.evaluateResolution as evaluateResolution
 import collections
 
 
-def create_sharpness_map(images, image_info, groups, progress_func, progress, max_progress):
+def create_sharpness_map(images, image_info, groups, weight, progress_func, progress, max_progress):
     sharpness_scores = []
 
     for idx, image in enumerate(images):
@@ -49,13 +49,13 @@ def create_sharpness_map(images, image_info, groups, progress_func, progress, ma
             avg_subject_sharpness_scores)
 
         for idx_in_group, index in enumerate(group):
-            sharpness_map[index] = group_sharpness_scores[idx_in_group] + \
-                (avg_subject_sharpness_scores[idx_in_group] / 2)
+            sharpness_map[index] = weight * (group_sharpness_scores[idx_in_group] + (
+                avg_subject_sharpness_scores[idx_in_group] / 2))
 
     return sharpness_map, progress
 
 
-def create_centering_map(image_info, groups, progress_func, progress, max_progress):
+def create_centering_map(image_info, groups, weight, progress_func, progress, max_progress):
     centering_map = {}
 
     for group in groups:
@@ -73,12 +73,13 @@ def create_centering_map(image_info, groups, progress_func, progress, max_progre
             group_centering_scores)
 
         for idx_in_group, index in enumerate(group):
-            centering_map[index] = group_centering_scores[idx_in_group]
+            centering_map[index] = weight * \
+                group_centering_scores[idx_in_group]
 
     return centering_map, progress
 
 
-def create_lighting_map(image_info, groups, progress_func, progress, max_progress):
+def create_lighting_map(image_info, groups, weight, progress_func, progress, max_progress):
     lighting_map = {}
     for group in groups:
         avg_subject_lighting_scores = []
@@ -99,12 +100,13 @@ def create_lighting_map(image_info, groups, progress_func, progress, max_progres
             avg_subject_lighting_scores)
 
         for idx_in_group, index in enumerate(group):
-            lighting_map[index] = avg_subject_lighting_scores[idx_in_group]
+            lighting_map[index] = weight * \
+                avg_subject_lighting_scores[idx_in_group]
 
     return lighting_map, progress
 
 
-def create_resolution_map(images, image_info, groups, progress_func, progress, max_progress):
+def create_resolution_map(images, image_info, groups, weight, progress_func, progress, max_progress):
     resolution_scores = []
     resolution_map = {}
 
@@ -130,7 +132,8 @@ def create_resolution_map(images, image_info, groups, progress_func, progress, m
             group_resolution_scores)
 
         for idx_in_group, index in enumerate(group):
-            resolution_map[index] = group_resolution_scores[idx_in_group]
+            resolution_map[index] = weight * \
+                group_resolution_scores[idx_in_group]
     return resolution_map, progress
 
 
@@ -139,6 +142,11 @@ def create_total_score_map(image_info, sharpness_map, centering_map, lighting_ma
         centering_map) + collections.Counter(lighting_map) + collections.Counter(resolution_map)
 
     overall_score_map = dict(overall_score_map)
+
+    if not len(overall_score_map.keys()):
+        for item in image_info:
+            overall_score_map[item[0]] = item[2]
+        return overall_score_map
 
     for item in image_info:
         overall_score_map[item[0]] += item[2]

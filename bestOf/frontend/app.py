@@ -73,24 +73,24 @@ def simulateAnalyzing(filenames, imagelist, groups, settings, callback):
         image_generator = loadImages(filenames)
 
         sharpness_map, progress = createScoreMaps.create_sharpness_map(
-            image_generator, imagelist, groups, callback, progress, maxProgress)
+            image_generator, imagelist, groups, settings["sharpness"], callback, progress, maxProgress)
         print(sharpness_map)
 
     if settings["centering"]:
         centering_map, progress = createScoreMaps.create_centering_map(
-            imagelist, groups, callback, progress, maxProgress)
+            imagelist, groups, settings["centering"], callback, progress, maxProgress)
         print(centering_map)
 
     if settings["lighting"]:
         lighting_map, progress = createScoreMaps.create_lighting_map(
-            imagelist, groups, callback, progress, maxProgress)
+            imagelist, groups, settings["lighting"], callback, progress, maxProgress)
         print(lighting_map)
 
     if settings["resolution"]:
         image_generator = loadImages(filenames)
 
         resolution_map, progress = createScoreMaps.create_resolution_map(
-            image_generator, imagelist, groups, callback, progress, maxProgress)
+            image_generator, imagelist, groups, settings["resolution"], callback, progress, maxProgress)
         print(resolution_map)
 
     total_score_map = createScoreMaps.create_total_score_map(
