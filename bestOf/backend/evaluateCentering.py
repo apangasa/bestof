@@ -10,6 +10,8 @@ def evaluate_centering(bounds_list, image):
     center = (im_width / 2, im_height / 2)
     total_dist = 0
 
+    print(bounds_list)
+
     for bounds in bounds_list:
         x, y, w, h = int(bounds.xmin * im_width), int(bounds.ymin * im_height), int(
             bounds.width * im_width), int(bounds.height * im_height)
@@ -17,9 +19,12 @@ def evaluate_centering(bounds_list, image):
         dist = euclidean(coord, center)
         total_dist += dist
 
-    max_dist = math.sqrt((center[0] ** 2) + (center[1] ** 2))
+    print('Total', total_dist)
 
-    return max_dist - (total_dist / len(bounds_list)) / max_dist if len(bounds_list) and max_dist else None
+    max_dist = math.sqrt((center[0] ** 2) + (center[1] ** 2))
+    print('Max', max_dist)
+
+    return (max_dist - (total_dist / len(bounds_list))) / max_dist if len(bounds_list) and max_dist else None
 
 
 def normalize_centering_scores(group_scores):
