@@ -52,16 +52,21 @@ def crop_subjects_from_segmented_image(image, n=8):
             seg = image[int(i * delta_h):int((i + 1) * delta_h),
                         int(j * delta_w):int((j + 1) * delta_w)]
             subs, bounds_list = crop_subjects(np.copy(seg, order='K'))
-            for bounds in bounds_list:
-                bounds.xmin = (int(j * delta_w) +
-                               (bounds.xmin * bounds.width)) / im_width
-                bounds.ymin = (int(i * delta_h) +
-                               (bounds.ymin * bounds.height)) / im_height
 
+            for bounds in bounds_list:
                 seg_width = int((j + 1) * delta_w) - int(j * delta_w)
                 seg_height = int((i + 1) * delta_h) - int(i * delta_h)
 
+                x_dist_to_seg = int(j * delta_w)
+                x_dist_from_seg_to_face = int(bounds.xmin * seg_width)
+                bounds.xmin = (x_dist_to_seg +
+                               x_dist_from_seg_to_face) / im_width
                 bounds.width = bounds.width * seg_width / im_width
+
+                y_dist_to_seg = int(i * delta_h)
+                y_dist_from_seg_to_face = int(bounds.ymin * seg_height)
+                bounds.ymin = (y_dist_to_seg +
+                               y_dist_from_seg_to_face) / im_height
                 bounds.height = bounds.height * seg_height / im_height
 
             all_subjects.extend(subs)
@@ -77,6 +82,22 @@ def crop_subjects_from_segmented_image(image, n=8):
             seg = image[int(i * delta_h):int((i + 1) * delta_h),
                         int(j * delta_w):int((j + 1) * delta_w)]
             subs, bounds_list = crop_subjects(np.copy(seg, order='K'))
+
+            for bounds in bounds_list:
+                seg_width = int((j + 1) * delta_w) - int(j * delta_w)
+                seg_height = int((i + 1) * delta_h) - int(i * delta_h)
+
+                x_dist_to_seg = int(j * delta_w)
+                x_dist_from_seg_to_face = int(bounds.xmin * seg_width)
+                bounds.xmin = (x_dist_to_seg +
+                               x_dist_from_seg_to_face) / im_width
+                bounds.width = bounds.width * seg_width / im_width
+
+                y_dist_to_seg = int(i * delta_h)
+                y_dist_from_seg_to_face = int(bounds.ymin * seg_height)
+                bounds.ymin = (y_dist_to_seg +
+                               y_dist_from_seg_to_face) / im_height
+                bounds.height = bounds.height * seg_height / im_height
 
             for idx, sub in enumerate(subs):
                 for existing_sub in all_subjects:
@@ -94,6 +115,22 @@ def crop_subjects_from_segmented_image(image, n=8):
             seg = image[int(i * delta_h):int((i + 1) * delta_h),
                         int(j * delta_w):int((j + 1) * delta_w)]
             subs, bounds_list = crop_subjects(np.copy(seg, order='K'))
+
+            for bounds in bounds_list:
+                seg_width = int((j + 1) * delta_w) - int(j * delta_w)
+                seg_height = int((i + 1) * delta_h) - int(i * delta_h)
+
+                x_dist_to_seg = int(j * delta_w)
+                x_dist_from_seg_to_face = int(bounds.xmin * seg_width)
+                bounds.xmin = (x_dist_to_seg +
+                               x_dist_from_seg_to_face) / im_width
+                bounds.width = bounds.width * seg_width / im_width
+
+                y_dist_to_seg = int(i * delta_h)
+                y_dist_from_seg_to_face = int(bounds.ymin * seg_height)
+                bounds.ymin = (y_dist_to_seg +
+                               y_dist_from_seg_to_face) / im_height
+                bounds.height = bounds.height * seg_height / im_height
 
             for idx, sub in enumerate(subs):
                 for existing_sub in all_subjects:
