@@ -7,7 +7,7 @@
 Simply run the following the commands:
 
 ```
-pip install bestOf==0.0.89
+pip install bestOf==0.0.90
 bestOf
 ```
 
@@ -16,7 +16,7 @@ bestOf
 Install the package by running the folllowing in WSL:
 
 ```
-pip install bestOf==0.0.89
+pip install bestOf==0.0.90
 ```
 
 Install Qt and related packages by running the following in WSL:
