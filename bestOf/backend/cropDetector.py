@@ -47,7 +47,7 @@ def test(image):
         return output.data.cpu().numpy()[0][0]
 
     except Exception as e:
-        print(e)
+        # print(e)
         return 0
 
 

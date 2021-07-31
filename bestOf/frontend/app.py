@@ -74,31 +74,31 @@ def simulateAnalyzing(filenames, imagelist, groups, settings, callback):
 
         sharpness_map, progress = createScoreMaps.create_sharpness_map(
             image_generator, imagelist, groups, settings["sharpness"], callback, progress, maxProgress)
-        print(sharpness_map)
+        # print(sharpness_map)
 
     if settings["centering"]:
         centering_map, progress = createScoreMaps.create_centering_map(
             imagelist, groups, settings["centering"], callback, progress, maxProgress)
-        print(centering_map)
+        # print(centering_map)
 
     if settings["lighting"]:
         lighting_map, progress = createScoreMaps.create_lighting_map(
             imagelist, groups, settings["lighting"], callback, progress, maxProgress)
-        print(lighting_map)
+        # print(lighting_map)
 
     if settings["resolution"]:
         image_generator = loadImages(filenames)
 
         resolution_map, progress = createScoreMaps.create_resolution_map(
             image_generator, imagelist, groups, settings["resolution"], callback, progress, maxProgress)
-        print(resolution_map)
+        # print(resolution_map)
 
     total_score_map = createScoreMaps.create_total_score_map(
         imagelist, sharpness_map, centering_map, lighting_map, resolution_map)
 
-    print('\n\n')
-    print('Total Score Map', total_score_map)
-    print('\n\n')
+    # print('\n\n')
+    # print('Total Score Map', total_score_map)
+    # print('\n\n')
 
     sorted_groups = []
     for group in groups:
@@ -232,7 +232,7 @@ class BestOfApp(QObject):
             vectors, threshold=self.settings["threshold"])
         self.groups = groups
 
-        print(self.groups)
+        # print(self.groups)
 
         image_generator = loadImages(list(file[0]))
 
@@ -296,7 +296,7 @@ class BestOfApp(QObject):
         if len(self.imageList):
             final = list(final) + self.imageList
         # final = sorted(final, key=lambda x: x[2], reverse=True)
-        print(final)
+        # print(final)
         self.imageList = list(final)
         self.statusChangedSignal.emit(
             "Successfully loaded images! Check Settings, then click Run Analysis to process your images.", "green")

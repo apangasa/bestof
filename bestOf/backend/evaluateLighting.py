@@ -81,12 +81,12 @@ if __name__ == '__main__':
         './bestOf/resources/examples/dark.jpg'))
 
     x, _ = pure_luminance_analysis(subs[0])
-    print(x)
+    # print(x)
 
     subs, _ = identifyPeople.crop_subjects(identifyPeople.read_img(
         './bestOf/resources/examples/bright.jpg'))
 
     x, _ = pure_luminance_analysis(subs[0])
-    print(x)
+    # print(x)
 
     # print(create_mesh(subs[0]))

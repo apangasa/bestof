@@ -68,7 +68,7 @@ def create_centering_map(image_info, groups, weight, progress_func, progress, ma
             progress += 1
             progress_func("centering", image_info[pos][1], int(
                 progress / max_progress * 100))
-        print(group_centering_scores)
+        # print(group_centering_scores)
         group_centering_scores = evaluateCentering.normalize_centering_scores(
             group_centering_scores)
 

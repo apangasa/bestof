@@ -96,6 +96,10 @@ class Ui_Results(QtCore.QObject):
     def display(self, imageList, groups):
         clearLayout(self.verticalLayout)
 
+        # print('Displaying Results...')
+        # print(groups)
+        # print(imageList)
+
         for pos, group in enumerate(groups):
             horizontalLayout = QtWidgets.QHBoxLayout()
             horizontalLayout.setSpacing(15)
@@ -160,4 +164,3 @@ if __name__ == "__main__":
     ui.setupUi(Form)
     Form.show()
     sys.exit(app.exec_())
-

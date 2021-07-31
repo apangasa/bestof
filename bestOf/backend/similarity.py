@@ -52,7 +52,7 @@ def group(vectors, threshold=0.9):
         for j, v in enumerate(vectors):
             if j > i:
                 scores[i].append(cos(u.unsqueeze(0), v.unsqueeze(0)))
-    print(scores)
+    # print(scores)
     groups = []
     for i, row in enumerate(scores):
         for j, element in enumerate(row):

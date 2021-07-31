@@ -239,9 +239,10 @@ def crop_subjects(image):
         try:
             sub = cv.cvtColor(sub, cv.COLOR_BGR2RGB)
         except:
-            print(xmin, ymin)
-            print(x, y, w, h)
-            print(sub)
+            pass
+            # print(xmin, ymin)
+            # print(x, y, w, h)
+            # print(sub)
 
         subjects.append(sub)
         bounds_list.append(bounds)

@@ -35,16 +35,15 @@ def make_set():
                 strings = img.split('.')
                 name = ""
                 if i > 0:
-                    name = strings[0] + '_Identified' + str(i) + '.' + strings[1]
+                    name = strings[0] + '_Identified' + \
+                        str(i) + '.' + strings[1]
                 else:
                     name = strings[0] + '_Identified' + '.' + strings[1]
 
-                cv.imwrite(os.path.join(new_set, folder + '_Identified', name), face)
-
+                cv.imwrite(os.path.join(
+                    new_set, folder + '_Identified', name), face)
 
     print('Number of failed identifications: ', str(unfound))
-
-
 
 
 def crop_all_images():
@@ -73,13 +72,16 @@ def crop_all_images():
             cropped_list = crop_an_image(image, rand_x / 100, rand_y / 100)
 
             index = randint(0, 3)
-            cv.imwrite(os.path.join(new_set, folder + '_Cropped', name), cropped_list[index])
+            cv.imwrite(os.path.join(new_set, folder +
+                                    '_Cropped', name), cropped_list[index])
             counter_cropped += 1
-        
+
         print("----Finished----\n")
 
     print("---------------------Done With Everything---------------------")
-    print("Out of " + str(counter) + " images\n" + str(counter_cropped) + " cropped images were created")
+    print("Out of " + str(counter) + " images\n" +
+          str(counter_cropped) + " cropped images were created")
+
 
 def crop_an_image(image, x, y):
     height = int(image.shape[0] * y)
@@ -94,5 +96,7 @@ def crop_an_image(image, x, y):
 
     return [left_cutoff, top_cutoff, right_cutoff, bottom_cutoff]
 
-#make_set()
-crop_all_images()
+
+# make_set()
+if __name__ == '__main__':
+    crop_all_images()

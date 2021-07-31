@@ -38,8 +38,8 @@ if __name__ == '__main__':
     img = identifyPeople.read_img(
         './bestOf/resources/examples/IMG_1667.jpg')
     s = evaluate_sharpness(img)
-    print(s)
+    # print(s)
     img = identifyPeople.read_img(
         './bestOf/resources/examples/IMG_1668.jpg')
     s = evaluate_sharpness(img)
-    print(s)
+    # print(s)

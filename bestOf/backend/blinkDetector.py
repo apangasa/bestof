@@ -45,8 +45,19 @@ def test(image):
         return output.data.cpu().numpy()[0][0]
 
     except Exception as e:
-        print(e)
+        # print(e)
         return 0
 
 
-# test(cv.imread('../resources/blinkset/blinkers/closed_eye_0059.jpg_face_2.jpg'))
+if __name__ == '__main__':
+    import identifyPeople
+
+    x = test(identifyPeople.read_img(
+        './bestOf/resources/blinkset/nonblinkers/Adrian_McPherson_0001.jpg'))
+    # print(x)
+
+    subs, _ = identifyPeople.crop_subjects(
+        identifyPeople.read_img('./bestOf/resources/examples/IMG_1351.jpg'))
+
+    x = test(subs[0])
+    # print(x)
