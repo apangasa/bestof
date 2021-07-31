@@ -1,4 +1,13 @@
 
+import bestOf.backend.sitePackagePathConstructor as sitePackagePathConstructor
+import bestOf.backend.createScoreMaps as createScoreMaps
+import bestOf.backend.evaluateCentering as evaluateCentering
+import bestOf.backend.identifyPeople as identifyPeople
+import bestOf.backend.evaluateLighting as evaluateLighting
+import bestOf.backend.evaluateSharpness as evaluateSharpness
+import bestOf.backend.cropDetector as cropDetector
+import bestOf.backend.blinkDetector as blinkDetector
+import bestOf.backend.similarity as similarity
 from PyQt5.QtGui import *
 import sys
 import numpy as np
@@ -20,16 +29,6 @@ import time
 import shutil
 import os
 sys.path.insert(1, 'bestOf/backend')
-
-import bestOf.backend.similarity as similarity
-import bestOf.backend.blinkDetector as blinkDetector
-import bestOf.backend.cropDetector as cropDetector
-import bestOf.backend.evaluateSharpness as evaluateSharpness
-import bestOf.backend.evaluateLighting as evaluateLighting
-import bestOf.backend.identifyPeople as identifyPeople
-import bestOf.backend.evaluateCentering as evaluateCentering
-import bestOf.backend.createScoreMaps as createScoreMaps
-import bestOf.backend.sitePackagePathConstructor as sitePackagePathConstructor
 
 
 def read_settings():

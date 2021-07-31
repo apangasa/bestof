@@ -114,12 +114,12 @@ class Ui_Results(QtCore.QObject):
                 for item in imageList:
                     if item[0] == index:
                         image = SelectableImage(index)
-                        image.setGeometry(0, 0, 200, 200)
+                        image.setGeometry(0, 0, 250, 250)
                         sizePolicy = QtWidgets.QSizePolicy(
                             QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
                         image.setSizePolicy(sizePolicy)
                         image.setPixmap(QtGui.QPixmap(item[1]).scaled(
-                            200, 200, QtCore.Qt.KeepAspectRatio))
+                            250, 250, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
                         image.toggled.connect(
                             lambda s, i: self.imageToggledSignal.emit(s, i))
                         horizontalLayout.addWidget(image)
@@ -160,4 +160,3 @@ if __name__ == "__main__":
     ui.setupUi(Form)
     Form.show()
     sys.exit(app.exec_())
-
