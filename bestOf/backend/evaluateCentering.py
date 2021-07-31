@@ -28,6 +28,8 @@ def evaluate_centering(bounds_list, image):
 
 
 def normalize_centering_scores(group_scores):
+    group_scores = [score if score else 0 for score in group_scores]
+
     max_val = max(group_scores)
 
     if not max_val:
